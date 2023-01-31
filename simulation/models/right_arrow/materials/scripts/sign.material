@@ -1,0 +1,14 @@
+material left_arrow_mat
+{
+	receive_shadows off
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture left_arrow.png
+			}
+		}
+	}
+}

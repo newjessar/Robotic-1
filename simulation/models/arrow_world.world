@@ -1,0 +1,2117 @@
+<sdf version='1.6'>
+  <world name='default'>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose frame=''>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+    <model name='my_ground_plane'>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <cast_shadows>0</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://my_ground_plane/materials/scripts</uri>
+              <uri>model://my_ground_plane/materials/textures/</uri>
+              <name>MyGroundPlane/Ground</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <physics name='default_physics' default='0' type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows>
+    </scene>
+    <audio>
+      <device>default</device>
+    </audio>
+    <wind/>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>0</latitude_deg>
+      <longitude_deg>0</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+    <model name='left_arrow'>
+      <pose frame=''>0.690107 -3.21764 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://left_arrow/meshes/sign.dae</uri>
+              <scale>0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://left_arrow/meshes/sign.dae</uri>
+              <scale>0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://left_arrow/materials/scripts</uri>
+              <uri>model://left_arrow/materials/textures</uri>
+              <name>left_arrow_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='right_arrow'>
+      <pose frame=''>24.4357 -13.776 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://right_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://right_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://right_arrow/materials/scripts</uri>
+              <uri>model://right_arrow/materials/textures</uri>
+              <name>left_arrow_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='up_arrow'>
+      <pose frame=''>5.86114 -3.27786 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://up_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://up_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://up_arrow/materials/scripts</uri>
+              <uri>model://up_arrow/materials/textures</uri>
+              <name>up_arrow_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='right_arrow_0'>
+      <pose frame=''>8.85238 12.7972 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://right_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://right_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://right_arrow/materials/scripts</uri>
+              <uri>model://right_arrow/materials/textures</uri>
+              <name>left_arrow_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='left_arrow_0'>
+      <pose frame=''>1.15826 12.8557 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://left_arrow/meshes/sign.dae</uri>
+              <scale>0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://left_arrow/meshes/sign.dae</uri>
+              <scale>0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://left_arrow/materials/scripts</uri>
+              <uri>model://left_arrow/materials/textures</uri>
+              <name>left_arrow_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='up_arrow_0'>
+      <pose frame=''>-6.18288 4.83953 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://up_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://up_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://up_arrow/materials/scripts</uri>
+              <uri>model://up_arrow/materials/textures</uri>
+              <name>up_arrow_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <state world_name='default'>
+      <sim_time>3474 767000000</sim_time>
+      <real_time>433 225495223</real_time>
+      <wall_time>1615489665 581895505</wall_time>
+      <iterations>426951</iterations>
+      <model name='body'>
+        <pose frame=''>2.25099 -2.29013 -1.1e-05 -0 1.9e-05 -0.005225</pose>
+        <scale>1 1 1</scale>
+        <link name='base_footprint'>
+          <pose frame=''>2.25099 -2.29013 -1.1e-05 -0 1.9e-05 -0.005225</pose>
+          <velocity>8e-06 -0 4.7e-05 0 -6e-06 1e-06</velocity>
+          <acceleration>0 0 -0 0 -0 0</acceleration>
+          <wrench>0 0 -0 0 -0 0</wrench>
+        </link>
+        <link name='left_front_wheel_link'>
+          <pose frame=''>2.25175 -2.14414 0.039989 3.14159 0.627856 3.13637</pose>
+          <velocity>7e-06 -0 4.7e-05 1e-06 0.000179 1e-06</velocity>
+          <acceleration>-0 0 -0 -0.001272 2e-06 -0</acceleration>
+          <wrench>-0 0 -0 0 -0 0</wrench>
+        </link>
+        <link name='right_front_wheel_link'>
+          <pose frame=''>2.25023 -2.43613 0.039989 0 0.642319 -0.005225</pose>
+          <velocity>7e-06 -0 4.7e-05 1e-06 0.000186 1e-06</velocity>
+          <acceleration>0 -0 0 -0.001319 2e-06 0</acceleration>
+          <wrench>0 -0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='left_arrow'>
+        <pose frame=''>0.690107 -3.21764 0.4 1.5708 4e-06 -1.54391</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>0.690107 -3.21764 0.4 1.5708 4e-06 -1.54391</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='left_arrow_0'>
+        <pose frame=''>1.15826 12.8557 0.4 1.5708 -4e-06 1.53834</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>1.15826 12.8557 0.4 1.5708 -4e-06 1.53834</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='left_arrow_0_clone'>
+        <pose frame=''>40.1575 14.1595 0.4 1.5708 -4e-06 1.53834</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>40.1575 14.1595 0.4 1.5708 -4e-06 1.53834</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='left_arrow_1'>
+        <pose frame=''>46.1611 5.12155 0.4 1.5708 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>46.1611 5.12155 0.4 1.5708 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='my_ground_plane'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='right_arrow'>
+        <pose frame=''>28.2949 -12.2665 0.400006 1.5708 4e-06 -1.58024</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>28.2949 -12.2665 0.400006 1.5708 4e-06 -1.58024</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='right_arrow_0'>
+        <pose frame=''>8.33799 12.8618 0.4 1.5708 -4e-06 1.56153</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>8.33799 12.8618 0.4 1.5708 -4e-06 1.56153</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='right_arrow_0_clone'>
+        <pose frame=''>34.8683 12.7812 0.399972 1.5708 -4e-06 1.56153</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>34.8683 12.7812 0.399972 1.5708 -4e-06 1.56153</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='right_arrow_1'>
+        <pose frame=''>44.8801 -7.19866 0.4 1.5708 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>44.8801 -7.19866 0.4 1.5708 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='smiley'>
+        <pose frame=''>15.6654 5.47511 0.4 1.5708 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>15.6654 5.47511 0.4 1.5708 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='smiley_0'>
+        <pose frame=''>17.6688 -1.1942 0.4 1.57079 -0 3.09188</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>17.6688 -1.1942 0.4 1.57079 -0 3.09188</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='smiley_1'>
+        <pose frame=''>36.7777 -12.3215 0.4 1.5708 4e-06 -1.54762</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>36.7777 -12.3215 0.4 1.5708 4e-06 -1.54762</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='smiley_2'>
+        <pose frame=''>32.3344 14.1713 0.4 1.5708 -4e-06 1.56569</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>32.3344 14.1713 0.4 1.5708 -4e-06 1.56569</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='smiley_3'>
+        <pose frame=''>-4.84541 7.76753 0.4 1.57079 -0 3.10049</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>-4.84541 7.76753 0.4 1.57079 -0 3.10049</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='smiley_4'>
+        <pose frame=''>9.0536 -1.83953 0.4 1.5708 4e-06 -1.60114</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>9.0536 -1.83953 0.4 1.5708 4e-06 -1.60114</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='smiley_5'>
+        <pose frame=''>13.1181 -4.48844 0.4 1.57079 2e-06 -2.41407</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>13.1181 -4.48844 0.4 1.57079 2e-06 -2.41407</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='square'>
+        <pose frame=''>17.6612 6.69733 0.4 1.57079 -0 3.12146</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>17.6612 6.69733 0.4 1.57079 -0 3.12146</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='square_0'>
+        <pose frame=''>44.8655 -0.585028 0.4 1.5708 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>44.8655 -0.585028 0.4 1.5708 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='square_1'>
+        <pose frame=''>26.6206 12.8164 0.4 1.5708 -4e-06 1.55738</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>26.6206 12.8164 0.4 1.5708 -4e-06 1.55738</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='square_2'>
+        <pose frame=''>8.33967 14.1675 1.87068 1.5708 -4e-06 1.57783</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>8.33967 14.1675 1.87068 1.5708 -4e-06 1.57783</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='square_3'>
+        <pose frame=''>-4.80887 2.89364 0.4 1.57079 -0 3.11851</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>-4.80887 2.89364 0.4 1.57079 -0 3.11851</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='square_4'>
+        <pose frame=''>17.3782 -12.679 0.4 1.57079 3e-06 -2.03422</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>17.3782 -12.679 0.4 1.57079 3e-06 -2.03422</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='triangle'>
+        <pose frame=''>25.1903 -13.6854 0.4 1.5708 4e-06 -1.55552</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>25.1903 -13.6854 0.4 1.5708 4e-06 -1.55552</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='triangle_0'>
+        <pose frame=''>44.8544 5.18401 0.4 1.5708 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>44.8544 5.18401 0.4 1.5708 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='triangle_1'>
+        <pose frame=''>2.35989 14.1757 0.4 1.5708 -4e-06 1.58074</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>2.35989 14.1757 0.4 1.5708 -4e-06 1.58074</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='triangle_2'>
+        <pose frame=''>2.62589 -1.85485 0.4 1.5708 4e-06 -1.57781</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>2.62589 -1.85485 0.4 1.5708 4e-06 -1.57781</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='triangle_3'>
+        <pose frame=''>16.824 -4.76666 0.4 1.57079 -0 3.07746</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>16.824 -4.76666 0.4 1.57079 -0 3.07746</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='up_arrow'>
+        <pose frame=''>5.86114 -3.27786 0.4 1.5708 4e-06 -1.56312</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>5.86114 -3.27786 0.4 1.5708 4e-06 -1.56312</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='up_arrow_0'>
+        <pose frame=''>-6.18288 4.83953 0.4 1.57079 -0 -3.12906</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>-6.18288 4.83953 0.4 1.57079 -0 -3.12906</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='up_arrow_1'>
+        <pose frame=''>22.3986 14.1309 0.4 1.5708 -4e-06 1.58526</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>22.3986 14.1309 0.4 1.5708 -4e-06 1.58526</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='up_arrow_2'>
+        <pose frame=''>37.0111 -13.6622 0.4 1.5708 4e-06 -1.56784</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>37.0111 -13.6622 0.4 1.5708 4e-06 -1.56784</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <light name='sun'>
+        <pose frame=''>0 0 10 0 -0 0</pose>
+      </light>
+    </state>
+    <model name='right_arrow_0_clone'>
+      <pose frame=''>27.3919 12.7846 0.4 1.5708 -4e-06 1.56153</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://right_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://right_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://right_arrow/materials/scripts</uri>
+              <uri>model://right_arrow/materials/textures</uri>
+              <name>left_arrow_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='left_arrow_0_clone'>
+      <pose frame=''>40.1575 14.1595 0.4 1.5708 -4e-06 1.53834</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://left_arrow/meshes/sign.dae</uri>
+              <scale>0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://left_arrow/meshes/sign.dae</uri>
+              <scale>0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://left_arrow/materials/scripts</uri>
+              <uri>model://left_arrow/materials/textures</uri>
+              <name>left_arrow_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='up_arrow_1'>
+      <pose frame=''>22.3986 14.1309 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://up_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://up_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://up_arrow/materials/scripts</uri>
+              <uri>model://up_arrow/materials/textures</uri>
+              <name>up_arrow_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='right_arrow_1'>
+      <pose frame=''>44.8801 -7.19866 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://right_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://right_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://right_arrow/materials/scripts</uri>
+              <uri>model://right_arrow/materials/textures</uri>
+              <name>left_arrow_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='left_arrow_1'>
+      <pose frame=''>46.1611 5.12155 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://left_arrow/meshes/sign.dae</uri>
+              <scale>0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://left_arrow/meshes/sign.dae</uri>
+              <scale>0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://left_arrow/materials/scripts</uri>
+              <uri>model://left_arrow/materials/textures</uri>
+              <name>left_arrow_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='up_arrow_2'>
+      <pose frame=''>37.0111 -13.6622 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://up_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://up_arrow/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://up_arrow/materials/scripts</uri>
+              <uri>model://up_arrow/materials/textures</uri>
+              <name>up_arrow_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose frame=''>2.72453 -5.95938 3.49237 -0 0.515643 1.8482</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+    <model name='smiley'>
+      <pose frame=''>15.6654 5.47511 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://smiley/materials/scripts</uri>
+              <uri>model://smiley/materials/textures</uri>
+              <name>smiley_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='smiley_0'>
+      <pose frame=''>17.6688 -1.1942 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://smiley/materials/scripts</uri>
+              <uri>model://smiley/materials/textures</uri>
+              <name>smiley_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='square'>
+      <pose frame=''>17.6612 6.69733 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://square/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://square/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://square/materials/scripts</uri>
+              <uri>model://square/materials/textures</uri>
+              <name>square_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='triangle'>
+      <pose frame=''>25.1903 -13.6854 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://triangle/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://triangle/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://triangle/materials/scripts</uri>
+              <uri>model://triangle/materials/textures</uri>
+              <name>triangle_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='smiley_1'>
+      <pose frame=''>36.7777 -12.3215 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://smiley/materials/scripts</uri>
+              <uri>model://smiley/materials/textures</uri>
+              <name>smiley_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='square_0'>
+      <pose frame=''>44.8655 -0.585028 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://square/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://square/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://square/materials/scripts</uri>
+              <uri>model://square/materials/textures</uri>
+              <name>square_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='triangle_0'>
+      <pose frame=''>44.8544 5.18401 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://triangle/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://triangle/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://triangle/materials/scripts</uri>
+              <uri>model://triangle/materials/textures</uri>
+              <name>triangle_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='smiley_2'>
+      <pose frame=''>32.3344 14.1713 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://smiley/materials/scripts</uri>
+              <uri>model://smiley/materials/textures</uri>
+              <name>smiley_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='square_1'>
+      <pose frame=''>26.6206 12.8164 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://square/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://square/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://square/materials/scripts</uri>
+              <uri>model://square/materials/textures</uri>
+              <name>square_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='square_2'>
+      <pose frame=''>8.33991 14.1331 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://square/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://square/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://square/materials/scripts</uri>
+              <uri>model://square/materials/textures</uri>
+              <name>square_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='triangle_1'>
+      <pose frame=''>2.35989 14.1757 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://triangle/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://triangle/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://triangle/materials/scripts</uri>
+              <uri>model://triangle/materials/textures</uri>
+              <name>triangle_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='smiley_3'>
+      <pose frame=''>-4.84541 7.76753 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://smiley/materials/scripts</uri>
+              <uri>model://smiley/materials/textures</uri>
+              <name>smiley_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='square_3'>
+      <pose frame=''>-4.80887 2.89364 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://square/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://square/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://square/materials/scripts</uri>
+              <uri>model://square/materials/textures</uri>
+              <name>square_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='triangle_2'>
+      <pose frame=''>2.62589 -1.85485 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://triangle/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://triangle/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://triangle/materials/scripts</uri>
+              <uri>model://triangle/materials/textures</uri>
+              <name>triangle_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='smiley_4'>
+      <pose frame=''>9.0536 -1.83953 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://smiley/materials/scripts</uri>
+              <uri>model://smiley/materials/textures</uri>
+              <name>smiley_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='smiley_5'>
+      <pose frame=''>13.1181 -4.48844 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://smiley/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://smiley/materials/scripts</uri>
+              <uri>model://smiley/materials/textures</uri>
+              <name>smiley_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='square_4'>
+      <pose frame=''>17.3782 -12.679 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://square/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://square/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://square/materials/scripts</uri>
+              <uri>model://square/materials/textures</uri>
+              <name>square_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='triangle_3'>
+      <pose frame=''>16.824 -4.76666 0.4 1.5708 -0 0</pose>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.083</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://triangle/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://triangle/meshes/sign.dae</uri>
+              <scale>-0.005 0.005 0.005</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://triangle/materials/scripts</uri>
+              <uri>model://triangle/materials/textures</uri>
+              <name>triangle_mat</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+  </world>
+</sdf>

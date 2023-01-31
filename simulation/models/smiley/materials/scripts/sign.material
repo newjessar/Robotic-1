@@ -1,0 +1,14 @@
+material smiley_mat
+{
+	receive_shadows off
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture smiley.png
+			}
+		}
+	}
+}

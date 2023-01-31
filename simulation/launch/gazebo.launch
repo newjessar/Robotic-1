@@ -1,0 +1,19 @@
+<launch>
+  <env name="GAZEBO_MODEL_PATH" value="$(find simulation)/models"/>
+  <env name="GAZEBO_RESOURCE_PATH" value="$(find simulation)/models"/>
+
+  <param name="/use_sim_time" value="true" />
+  <param name="robot_description" command="$(find xacro)/xacro $(find robot_description)/urdf/body.xacro" />
+  <param name="bot_description" command="$(find xacro)/xacro $(find robot_description)/urdf/bot.xacro" />
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" >
+    <arg name="world_name" value="$(find simulation)/models/my_world.world" />
+    <arg name="gui" value="true" />
+  </include>
+
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model body -param robot_description -z 0.1 -y -2.75" />
+  
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
+
+
+</launch>

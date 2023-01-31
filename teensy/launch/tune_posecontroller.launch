@@ -1,0 +1,7 @@
+<launch>
+
+<node pkg="teensy" name="pose_control" type="pose_control.py" output="screen"/>
+
+<node name="param_sliders" pkg="rqt_ez_publisher" type="rqt_ez_publisher" />
+
+</launch>

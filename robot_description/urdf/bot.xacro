@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="body" >
+
+  <xacro:include filename="$(find robot_description)/urdf/common.xacro" />
+  <xacro:include filename="$(find robot_description)/urdf/gazebo.xacro" />
+
+  <link name="base_footprint" />
+
+  <link name="base_link" >
+    <visual>
+      <geometry>
+        <box size="${body_length} ${body_width} ${body_height}" />
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${body_length} ${body_width} ${body_height}" />
+      </geometry>
+    </collision>
+    <inertial> 
+      <mass value="${body_mass}" />
+      <origin xyz="0 0 0" />
+      <inertia
+        ixx="${1/12 * body_mass * (body_height**2 + body_width**2)}" ixy="0.0" ixz="0.0" 
+        iyy="${1/12 * body_mass * (body_length**2 + body_height**2)}" iyz="0.0" 
+        izz="${1/12 * body_mass * (body_width**2 + body_length**2)}" />
+    </inertial>
+  </link>
+   
+  <link name="back_link" >
+    <visual>
+      <geometry>
+        <box size="${body_length*0.8} ${body_width} ${body_height*4}" />
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${body_length*0.8} ${body_width} ${body_height*4}" />
+      </geometry>
+    </collision>
+    <inertial> 
+      <mass value="${body_mass}" />
+      <origin xyz="0 0 0" />
+      <inertia
+        ixx="${1/12 * body_mass * (body_height**2 + body_width**2)}" ixy="0.0" ixz="0.0" 
+        iyy="${1/12 * body_mass * (body_length**2 + body_height**2)}" iyz="0.0" 
+        izz="${1/12 * body_mass * (body_width**2 + body_length**2)}" />
+    </inertial>
+  </link>
+  <gazebo reference="back_link" >
+    <material value="Gazebo/Blue" />
+  </gazebo>
+
+  <joint name="base_footprint_to_base_link" type="fixed" >
+    <parent link="base_footprint" />
+    <child link="base_link" />
+    <origin xyz="${-body_length/2 + wheel_radius} 0 ${wheel_radius + wheel_z_offset}" rpy="0 0 0" />
+  </joint>
+
+  <joint name="base_footprint_to_back_link" type="fixed" >
+    <parent link="base_link" />
+    <child link="back_link" />
+    <origin xyz="${-body_length*0.1} 0 ${body_height*2 + body_height/2}" rpy="0 0 0" />
+  </joint>
+  
+  <xacro:create_wheel name="left_front" xyz="${body_length/2 - wheel_radius} ${body_width/2 + wheel_width/2 + wheel_offset} ${-wheel_z_offset}" friction="100.0" type="continuous" mass="${wheel_mass}"  />
+  <xacro:create_wheel name="right_front" xyz="${body_length/2 - wheel_radius} ${-body_width/2 - wheel_width/2 - wheel_offset} ${-wheel_z_offset}" friction="100.0" type="continuous" mass="${wheel_mass}" />
+  <xacro:create_wheel name="left_back" xyz="${-body_length/2 + wheel_radius} ${body_width/2 + wheel_width/2 + wheel_offset} ${-wheel_z_offset}"  friction="0.0" type="fixed" mass="${wheel_mass}" />
+  <xacro:create_wheel name="right_back" xyz="${-body_length/2 + wheel_radius} ${-body_width/2 - wheel_width/2 - wheel_offset} ${-wheel_z_offset}" friction="0.0" type="fixed" mass="${wheel_mass}" />
+  
+  <joint name="camera_joint" type="fixed">
+    <axis xyz="0 0 0" />
+    <origin xyz="${body_length/2 - 0.025} 0 0.1" rpy="0 ${0 * pi/180.0} 0"/>
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+  </joint>
+
+  <!-- Camera -->
+  <link name="camera_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+    <box size="0.05 0.05 0.05"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+    <box size="0.05 0.05 0.05"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+
+</robot>

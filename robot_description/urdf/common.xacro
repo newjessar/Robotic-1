@@ -1,0 +1,69 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" >
+  <xacro:property name="body_length" value="0.35" />
+  <xacro:property name="body_width" value="0.24" />
+  <xacro:property name="body_height" value="0.02" />
+  <xacro:property name="body_mass" value="4.0" />
+  <xacro:property name="wheel_z_offset" value="0.03" />
+  <xacro:property name="wheel_radius" value="0.04" />
+  <xacro:property name="wheel_width" value="0.05" />
+  <xacro:property name="wheel_mass" value="0.3" />
+  <xacro:property name="wheel_offset" value="0.001" />
+  <xacro:property name="camera_x" value="0.075" /> <!--${0.075}-->
+  <xacro:property name="camera_z" value="0.45" />
+  <xacro:property name="camera_angle" value="${39 * pi/180.0}" /> <!--25 for realsense model-->
+  <xacro:property name="arm_x_offset" value="${body_length/2 - 0.06 - 0.02 + 0.0064}" />
+  <xacro:property name="arm_z_offset" value="${body_height}" />
+  <xacro:property name="laser_x" value="0.0" />
+  <xacro:property name="laser_y" value="0.0" />
+  <xacro:property name="laser_z" value="${0.05}" />
+
+
+  <xacro:macro name="create_wheel" params="name xyz friction type mass">
+    <link name="${name}_wheel_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 ${pi}" />
+        <geometry>
+          <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
+        </geometry>
+        <material name="blackish">
+          <color rgba="0.2 0.2 0.2 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
+        <geometry>
+          <cylinder length="${wheel_width}" radius="${wheel_radius}"/>>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${mass}" />
+        <inertia ixx="${0.0833333 * mass * (3 * wheel_radius**2 + wheel_width**2)}" ixy="0.0" ixz="0.0"
+          iyy="${0.5 * mass * wheel_radius**2}" iyz="0.0"
+          izz="${0.083333 * mass *(3 * wheel_radius**2 + wheel_width**2)}" />
+      </inertial>
+    </link>
+
+    <gazebo reference="${name}_wheel_link">
+      <mu1 value="${friction}"/>
+      <mu2 value="${friction}"/>
+      <kp  value="1000000.0" />
+      <kd  value="1.0" />
+      <maxVel  value="1.0" />
+      <minDepth  value="0.0" />
+      <material value="Gazebo/FlatBlack" />
+    </gazebo>
+
+    <joint name="${name}_wheel_joint" type="${type}">
+      <origin xyz="${xyz}" rpy="0 0 0" />
+      <parent link="base_link"/>
+      <child link="${name}_wheel_link"/>
+      <axis xyz="0 1 0"/>
+      
+      <calibration rising="0.0"/>
+      <dynamics damping="1.0" friction="0.0"/>
+      <limit effort="400" velocity="50.0" />
+      <safety_controller k_velocity="50" />
+    </joint>
+  </xacro:macro>
+
+</robot>

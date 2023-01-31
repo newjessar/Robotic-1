@@ -1,0 +1,14 @@
+material up_arrow_mat
+{
+	receive_shadows off
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture up_arrow.png
+			}
+		}
+	}
+}
