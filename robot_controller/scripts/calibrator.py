@@ -13,6 +13,7 @@ import os
 from std_srvs.srv import Empty, SetBool
 import rospkg 
 #from utils import preprocess_image
+from lane_follower import LaneFollower
 
 class Calibrator(object):
     
@@ -81,30 +82,31 @@ class Calibrator(object):
         self.gui.after(100, self.update_loop)
         
 
-    def to_hsv(self, image):
-        # Convert to HSV 
-        # Return hsv_image
-        pass
+    #def to_hsv(self, image):
+    #    # Convert to HSV 
+    #    # Return hsv_image
+    #    pass
 
-    def filter_hsv(self, hsv_image):
-        lower_hsv = np.asarray([self.h_lower_scale.get(), self.s_lower_scale.get(), self.v_lower_scale.get()])
-        upper_hsv = np.asarray([self.h_upper_scale.get(), self.s_upper_scale.get(), self.v_upper_scale.get()])
-        # Filter out everything but the red signs
-        # Return filtered_hsv_image
-        pass
+    #def filter_hsv(self, hsv_image, lower_hsv, upper_hsv):
+    #    
+    #    # Filter out everything but the red signs
+    #    # Return filtered_hsv_image
+    #    pass
 
     def filter_image(self, image):
         kernel = np.ones((5,5),np.uint8)
         dilation_steps = self.dilation_steps.get()
         erosion_steps = self.erosion_steps.get()
 
-        hsv_image  = self.to_hsv(image)
+        hsv_image  = LaneFollower.to_hsv(image)
+        lower_hsv = np.asarray([self.h_lower_scale.get(), self.s_lower_scale.get(), self.v_lower_scale.get()])
+        upper_hsv = np.asarray([self.h_upper_scale.get(), self.s_upper_scale.get(), self.v_upper_scale.get()])
 
-        mask = self.filter_hsv(hsv_image)
+        mask = LaneFollower.filter_hsv(hsv_image, lower_hsv, upper_hsv)
         mask = cv2.dilate(mask,kernel,iterations = dilation_steps)
         mask = cv2.erode(mask, kernel, iterations = erosion_steps)
         filtered_image = cv2.bitwise_and(hsv_image, hsv_image, mask = mask)
-        filtered_rgb_image = cv2.cvtColor(filtered_image, cv2.COLOR_HSV2BGR)
+        filtered_rgb_image = cv2.cvtColor(filtered_image, cv2.COLOR_HSV2RGB)
         return filtered_rgb_image
 
 rospy.init_node("calibrator")

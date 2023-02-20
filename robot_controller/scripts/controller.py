@@ -19,8 +19,8 @@ class Controller(object):
     self.sign_recognizer = SignRecognizer(data_collection_mode=True, data_filename=None) 
 
     # Service definitions
-    self.switch_left_service = rospy.Service("/switch_left", Empty, self.switch_left_callback)
-    self.switch_right_service = rospy.Service("/switch_right", Empty, self.switch_right_callback)
+    self.switch_left_service = rospy.Service("/switch_left", Empty, self.initiate_switch_left)
+    self.switch_right_service = rospy.Service("/switch_right", Empty, self.initiate_switch_right)
     self.set_speed_service = rospy.Service("/set_speed", SetSpeed, self.set_speed_callback)
 
   # Command via terminal to call this function: rosservice call /set_speed "speed: 0.0"
@@ -28,16 +28,20 @@ class Controller(object):
     # Max forward speed should be 1.2 m/s
     # Update forward speed
     # Update lane follower forward speed 
+    velocity = max(0.0, min(speed_msg.speed, 1.2))
+    self.forward_speed = velocity
+    self.lane_follower.forward_speed = velocity
+    
     return SetSpeedResponse()
   
   # Command via terminal to call this function: rosservice call /switch_left
-  def switch_left_callback(self, empty_msg):
+  def initiate_switch_left(self, empty_msg):
     # Check line angles to see if you can switch lanes
     # Start the lane switching
     return EmptyResponse()
   
   # Command via terminal to call this function: rosservice call /switch_right
-  def switch_right_callback(self, empty_msg):
+  def initiate_switch_right(self, empty_msg):
     # Check line angles to see if you can switch lanes
     # Start the lane switching
     return EmptyResponse()
