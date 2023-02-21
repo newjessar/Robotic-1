@@ -75,7 +75,7 @@ class Calibrator(object):
         
     def update_loop(self):
         image_msg = rospy.wait_for_message("/camera/image_raw", Image)
-        image = self.cv_bridge.imgmsg_to_cv2(image_msg)
+        image = self.cv_bridge.imgmsg_to_cv2(image_msg, "bgr8")
         image = self.filter_image(image)
         cv2.imshow("Image", image)
         cv2.waitKey(1)
@@ -106,7 +106,7 @@ class Calibrator(object):
         mask = cv2.dilate(mask,kernel,iterations = dilation_steps)
         mask = cv2.erode(mask, kernel, iterations = erosion_steps)
         filtered_image = cv2.bitwise_and(hsv_image, hsv_image, mask = mask)
-        filtered_rgb_image = cv2.cvtColor(filtered_image, cv2.COLOR_HSV2RGB)
+        filtered_rgb_image = cv2.cvtColor(filtered_image, cv2.COLOR_HSV2BGR)
         return filtered_rgb_image
 
 rospy.init_node("calibrator")
