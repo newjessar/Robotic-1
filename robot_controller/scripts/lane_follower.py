@@ -16,7 +16,7 @@ class LaneFollower(object):
     image_topic = "/camera/image_raw"
 
     self.cmd_vel_publisher = rospy.Publisher(cmd_topic, Twist, queue_size=1)
-    self.image_subscriber = rospy.Subscriber(image_topic, Image, self.image_callback, queue_size=1)
+    
     self.original_image = None
     self.hsv_upper_values = [255,255,255]
     self.hsv_lower_values = [0,0,0]
@@ -28,6 +28,7 @@ class LaneFollower(object):
     self.left_angle = 0
     self.right_angle = 0
     self.far_right_angle = 0
+    self.image_subscriber = rospy.Subscriber(image_topic, Image, self.image_callback, queue_size=1)
 
   def on_shutdown(self):
     twist_msg = Twist()
