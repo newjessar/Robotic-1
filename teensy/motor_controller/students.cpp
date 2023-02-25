@@ -1,5 +1,7 @@
 #include "students.h"
 #include <Arduino.h>
+
+double pi = 3.14159265358979323846;
 /*
  * Some small notions regarding C++. The code in this file was made to be as similar to C, while keeping it accessable with some C++ features, namely the usage of references.
  * In earlier courses, which use the C language, you've probably have seen two types of function arguments. Either passing a copy of a variable, or passing a pointer to an variable.
@@ -51,9 +53,9 @@
 void set_parameters(double& k_p, double& k_i, double& k_d, double& k_rho, double& k_alpha, double& k_beta)
 {
   //set your tuned PID parameters here:
-  k_p = 0;
-  k_i = 0;
-  k_d = 0;
+  k_p = 120;
+  k_i = 4100;
+  k_d = 0.17;
 
   //store your found position control parameters here:
   k_rho = 0;
@@ -65,16 +67,18 @@ void set_parameters(double& k_p, double& k_i, double& k_d, double& k_rho, double
 
 /* This function should calculate what the rotational velocities of the wheels should be, given a command velocity for the robot itself.
  * 
- * double forward_velocity : This variable contains the target forward velocity of the robot itself (m/s)
- * double rotational_velocity : This variable contains the target rotation velocity of the robot itself. (rads/s)
- * double wheel_radius : The radius of the wheels.
- * double track : The distance between the wheels.
- * double& left_wheel_velocity : Store the calculated rotational velocity for the left wheel in this variable (rads/s)
- * double& right_wheel_velocity : Store the calculated rotational velocity for the right wheel in this variable (rads/s)
+ * double& w_left_wheel_velocity : Store the calculated rotational velocity for the left wheel in this variable (rads/s)
+ * double& w_right_wheel_velocity : Store the calculated rotational velocity for the right wheel in this variable (rads/s)
+ * double  L:  track : The distance between the wheels.
+ * double  r: wheel_radius : The radius of the wheels.
+ * double  v: forward_velocity : This variable contains the target forward velocity of the robot itself (m/s)
+ * double  w_base rotational_velocity : This variable contains the target rotation velocity of the robot itself. (rads/s)
  */
 void base_velocity_to_wheel_velocity(double forward_velocity, double rotational_velocity, double wheel_radius, double track, double& left_wheel_velocity, double& right_wheel_velocity)
 {
-
+  // inverse delta_radians and velocity gives us the following:
+  left_wheel_velocity = (2* forward_velocity + rotational_velocity * track) / (2 * wheel_radius);
+  right_wheel_velocity = (2* forward_velocity - rotational_velocity * track) / (2 * wheel_radius);
 }
 
 /*
@@ -86,6 +90,9 @@ void base_velocity_to_wheel_velocity(double forward_velocity, double rotational_
  */
 void calculate_wheel_movement(double delta_encoder_position, int ticks_per_rotation, double delta_time, float& delta_radians, double& velocity)
 {
+  // Calculate the dalta radians and velocity
+  delta_radians = (delta_encoder_position/ delta_time) * (1.0/ ticks_per_rotation);
+  velocity = (delta_encoder_position/ delta_time) * (1.0/ ticks_per_rotation) * (2* pi);
 
 }
 
@@ -106,7 +113,15 @@ void calculate_wheel_movement(double delta_encoder_position, int ticks_per_rotat
  */
 double calculate_pid(double kp, double ki, double kd, double target_velocity, double measured_velocity, double delta_time, float& previous_error, float& sum)
 {
-
+  // calculate the K value
+  double error = target_velocity - measured_velocity;
+  // calculate the i value
+  sum += error * delta_time;
+  // calculate the d value
+  double differential_drive = (error - previous_error) / delta_time;
+  previous_error = error;
+  
+  return kp * error + ki * sum + kd * differential_drive;
 }
 
 
