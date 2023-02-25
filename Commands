@@ -1,0 +1,8 @@
+roscore
+roslaunch simulation gazebo.launch
+rosrun robot_controller controller.py
+rosrun keyboard_teleop keyboard_teleop_node
+
+rosservice call /set_speed "speed: 0.0" 
+rosservice call /switch_left
+rosservice call /switch_right
