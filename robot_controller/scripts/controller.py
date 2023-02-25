@@ -2,7 +2,7 @@
 import rospy 
 from lane_follower import LaneFollower
 from laser_data import LaserData
-from sign_recognizer import SignRecognizer
+# from sign_recognizer import SignRecognizer
 from object_tracker import ObjectTracker
 from std_srvs.srv import Empty, EmptyResponse
 from bot_message.srv import SetSpeed, SetSpeedResponse
@@ -16,7 +16,7 @@ class Controller(object):
     self.laser_data = LaserData(self.laser_callback)
     
     # Change the parameter depending on if you are collecting data or using a trained network to predict. 
-    self.sign_recognizer = SignRecognizer(data_collection_mode=True, data_filename=None) 
+    # self.sign_recognizer = SignRecognizer(data_collection_mode=True, data_filename=None) 
 
     # Service definitions
     self.switch_left_service = rospy.Service("/switch_left", Empty, self.initiate_switch_left)
