@@ -62,31 +62,33 @@ class LaneFollower(object):
     # Filter each line to determine to which lane in belongs to 
     # Return far_left, left, right, far_right
     # Get lists of all four lines
-    _, binary_mask_width, _ = binary_mask.shape
+    
+    _, binary_mask_width = binary_mask.shape
     binary_mask_middle = binary_mask_width / 2
     segmented_image_width = binary_mask_middle / 2
-    
-    # Declare the lines
+
+    # # Declare the lines
     far_left, left, right, far_right = [], [], [], []
 
     # Find all the lines using cv2.HoughLinesP function
-    lines = cv2.HoughLinesP(binary_mask, 1, np.pi/180, 100, minLineLength=100, maxLineGap=10)
-    
+    lines = np.asarray(cv2.HoughLinesP(binary_mask, 1, np.pi/180, 100, minLineLength=100, maxLineGap=10))
+   
     # Filter the lines into the four lists
     if lines is not None:
       for line in lines:
         x1, y1, x2, y2 = line[0]
-        print(line[0])
-        # if x1 < binary_mask_middle - segmented_image_width and x2 < binary_mask_middle - segmented_image_width:
-        #       far_left.append(line[0])
-        # elif x1 < binary_mask_middle and x2 < binary_mask_middle:
-        #   left.append(line[0])
-        # elif x1 > binary_mask_middle and x2 > binary_mask_middle:
-        #   right.append(line[0])
-        # elif x1 > binary_mask_middle + segmented_image_width and x2 > binary_mask_middle + segmented_image_width:
-        #   far_right.append(line[0])
+        
+        
+        if x1 < binary_mask_middle - segmented_image_width and x2 < binary_mask_middle - segmented_image_width:
+              far_left.append(line[0])
+        elif x1 < binary_mask_middle and x2 < binary_mask_middle:
+              left.append(line[0])
+        elif x1 > binary_mask_middle and x2 > binary_mask_middle:
+              right.append(line[0])
+        elif x1 > binary_mask_middle + segmented_image_width and x2 > binary_mask_middle + segmented_image_width:
+              far_right.append(line[0])
 
-    return far_left, left, right, far_right
+    return np.asarray(far_left), np.asarray(left), np.asarray(right), np.asarray(far_right)
   
   def get_angles(self, far_left, left, right, far_right):
     # Determine the angle for list of lines
@@ -154,25 +156,28 @@ class LaneFollower(object):
     warped_image = self.warp_perspective(image)
     _, warped_image_width, _ = warped_image.shape # Get the height, width, channels from the warped image 
     middle = warped_image_width / 2 # Determine the center of the image 
-    segment_width = middle / 2 # Determine the width of each segment 
-
+    segment_width = middle / 2 # Determine the width of each segment of the image
     
     # Convert and filter HSV (use the calibrator to find correct HSV filter values)
     hsv_image = self.to_hsv(warped_image)
     filtered_hsv_image = self.filter_hsv(hsv_image, self.hsv_lower_values, self.hsv_upper_values)
 
 
+    # showing the warped image
+    # self.show_image("filtered_hsv_image", filtered_hsv_image)
 
 
     # Filter the lines to determine which lane they belong to
-    lines = self.get_lines(filtered_hsv_image)
-
-    # showing the warped image
-    self.show_image("filtered_hsv_image", filtered_hsv_image)
-
+    far_left, left, right, far_right = self.get_lines(filtered_hsv_image)
+    # print("left: ", left)
     # Draw the Probabilistic Line Transform. 
-    # self.draw_line(filtered_hsv_image, lines)
-    # self.draw_info(filtered_hsv_image, warped_image_middle, segmented_image_width)
+    # self.draw_lines(filtered_hsv_image, far_left)
+    print("Far left: ", far_left)
+    self.draw_line(filtered_hsv_image, far_left)
+    # self.draw_lines(filtered_hsv_image, right)
+    # self.draw_lines(filtered_hsv_image, far_right)
+
+    # self.draw_info(filtered_hsv_image, middle, segment_width)
 
     
     # Determine the angles of each line
