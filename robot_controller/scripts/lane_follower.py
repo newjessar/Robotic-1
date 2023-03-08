@@ -113,22 +113,20 @@ class LaneFollower(object):
   
   ## Draw a blue overlay line on the image
   def draw_line(self, image, line):
-    if line is not None:
-      x1, y1, x2, y2 = line
-      cv2.line(image, (x1, y1), (x2, y2), (255, 0, 0), 2)
+  
+      if line is not None:
+        x1, y1, x2, y2 = line
+        cv2.line(image, (x1, y1), (x2, y2), (0, 0, 255), 1)
+        
     
   # Draw the four lines (Far left, Left, Right, and Far right), and 
   # put the text of each line on the image
   def draw_info(self, image, middle, width):
-    self.draw_line(image, self.far_left)
-    self.draw_line(image, self.left)
-    self.draw_line(image, self.right)
-    self.draw_line(image, self.far_right)
-    
-    self.put_text(image, (middle - width, 50), "Far Left")
-    self.put_text(image, (middle - width, 70), "Left")
-    self.put_text(image, (middle - width, 90), "Right")
-    self.put_text(image, (middle - width, 110), "Far Right")
+    # Draw the four lines
+    self.draw_line(image, [middle, 0, middle, 400])
+
+
+
 
 
 
@@ -164,16 +162,15 @@ class LaneFollower(object):
 
 
     # showing the warped image
-    # self.show_image("filtered_hsv_image", filtered_hsv_image)
+    self.show_image("filtered_hsv_image", filtered_hsv_image)
 
 
     # Filter the lines to determine which lane they belong to
     far_left, left, right, far_right = self.get_lines(filtered_hsv_image)
-    # print("left: ", left)
+
     # Draw the Probabilistic Line Transform. 
-    # self.draw_lines(filtered_hsv_image, far_left)
-    print("Far left: ", far_left)
-    self.draw_line(filtered_hsv_image, far_left)
+    self.draw_info(filtered_hsv_image, middle, segment_width)
+
     # self.draw_lines(filtered_hsv_image, right)
     # self.draw_lines(filtered_hsv_image, far_right)
 
