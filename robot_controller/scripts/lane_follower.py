@@ -77,8 +77,7 @@ class LaneFollower(object):
     if lines is not None:
       for line in lines:
         x1, y1, x2, y2 = line[0]
-        
-        
+                
         if x1 < binary_mask_middle - segmented_image_width and x2 < binary_mask_middle - segmented_image_width:
               far_left.append(line[0])
         elif x1 < binary_mask_middle and x2 < binary_mask_middle:
@@ -93,42 +92,35 @@ class LaneFollower(object):
   def get_angles(self, far_left, left, right, far_right):
     # Determine the angle for list of lines
     # Store the angles in the class variables self.far_left_angle, self.left_angle, self.right_angle, self.far_right_angle
-    pass
+    # Return the four angles
+    # Get the angle for each line
+
+    if left.size > 0:
+      self.left_angle = np.mean(np.arctan2(left[:, 3] - left[:, 1], left[:, 2] - left[:, 0]))
+      print("left angle: ", self.left_angle)
+
+    if right.size > 0:
+      self.right_angle = np.mean(np.arctan2(right[:, 3] - right[:, 1], right[:, 2] - right[:, 0]))
+      print("right angle: ", self.right_angle)
+
+
 
   def send_velocity(self, omega): 
     # Create a Twist message
-
     msg = Twist()
   
-
     # Limit the rotational velocity to (-)0.5 rad/s, this will help with switching lanes
     # For the forward velocity use the self.forward_velocity variable
     # use the self.cmd_vel_publisher to publish the velocity
     self.cmd_vel_publisher.publish(msg)
 
-  
-  # Put text on the image  
-  def put_text(self, image, position, text ="", color=(255, 255, 255)):
-    cv2.putText(image, text, position, cv2.FONT_HERSHEY_COMPLEX, 0.6, color)
-  
+
   ## Draw a blue overlay line on the image
   def draw_line(self, image, line):
-  
-      if line is not None:
-        x1, y1, x2, y2 = line
-        cv2.line(image, (x1, y1), (x2, y2), (0, 0, 255), 1)
+    if line is not None:
+      x1, y1, x2, y2 = line
+      cv2.line(image, (x1, y1), (x2, y2), (255, 0, 0), 2)
         
-    
-  # Draw the four lines (Far left, Left, Right, and Far right), and 
-  # put the text of each line on the image
-  def draw_info(self, image, middle, width):
-    # Draw the four lines
-    self.draw_line(image, [middle, 0, middle, 400])
-
-
-
-
-
 
   def show_image(self, name, image):
     cv2.imshow(name, image)
@@ -139,10 +131,22 @@ class LaneFollower(object):
     if key == ord('s'): # Pressing 's' will save the image
       cv2.imwrite("lane_follower_image.png", image)
 
+  # # Draw the four lines (Far left, Left, Right, and Far right), and 
+  # # put the text of each line on the image
+  # def draw_info(self, image, middle, width):
+  #   # Draw the four lines
+  #   self.draw_line(image, [middle, 0, middle, 400])
+
+  
+  # # Put text on the image  
+  # def put_text(self, image, position, text ="", color=(255, 255, 255)):
+  #   cv2.putText(image, text, position, cv2.FONT_HERSHEY_COMPLEX, 0.6, color)
+  
+
 
   # Image callback function, gets called at 10Hz 
   def image_callback(self, image_msg):
-    # Convert the sensor_msgs Image to OpenCv image
+        # Convert the sensor_msgs Image to OpenCv image
     # An OpenCV image has the color channels in order BGR (instead of the more common RGB)
     image = self.cv_bridge.imgmsg_to_cv2(image_msg, "bgr8") 
     # image is now an OpenCV image
@@ -160,16 +164,30 @@ class LaneFollower(object):
     hsv_image = self.to_hsv(warped_image)
     filtered_hsv_image = self.filter_hsv(hsv_image, self.hsv_lower_values, self.hsv_upper_values)
 
-
-    # showing the warped image
-    self.show_image("filtered_hsv_image", filtered_hsv_image)
+    warped_image_copy = warped_image.copy()
 
 
     # Filter the lines to determine which lane they belong to
     far_left, left, right, far_right = self.get_lines(filtered_hsv_image)
 
     # Draw the Probabilistic Line Transform. 
-    self.draw_info(filtered_hsv_image, middle, segment_width)
+    for line in far_left:
+          self.draw_line(warped_image_copy, line)
+
+    for line in left:
+          self.draw_line(warped_image_copy, line)
+
+    for line in right:
+          self.draw_line(warped_image_copy, line)
+
+    for line in far_right:
+          self.draw_line(warped_image_copy, line)
+    # print("far_left: ", far_left)
+
+    # showing the warped image
+    self.show_image("filtered_hsv_image", warped_image_copy)
+    
+    self.get_angles(far_left, left, right, far_right)
 
     # self.draw_lines(filtered_hsv_image, right)
     # self.draw_lines(filtered_hsv_image, far_right)
