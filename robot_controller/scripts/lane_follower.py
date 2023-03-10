@@ -59,52 +59,72 @@ class LaneFollower(object):
   # Get all the lines form the HSV image, and separate the lines into far_left_line, 
   # left_line, right_line, far_right_line
   def get_lines(self, binary_mask):
-    # Filter each line to determine to which lane in belongs to 
+        # Filter each line to determine to which lane in belongs to 
     # Return far_left, left, right, far_right
     # Get lists of all four lines
     
     _, binary_mask_width = binary_mask.shape
-    binary_mask_middle = binary_mask_width / 2
-    segmented_image_width = binary_mask_middle / 2
+    middle_lane = binary_mask_width / 2
+    segmented_width = middle_lane / 2
 
     # # Declare the lines
-    far_left, left, right, far_right = [], [], [], []
-
+    far_left_line, left_line, right_line, far_right_line = [], [], [], []
     # Find all the lines using cv2.HoughLinesP function
-    lines = np.asarray(cv2.HoughLinesP(binary_mask, 1, np.pi/180, 100, minLineLength=100, maxLineGap=10))
+    lines = np.asarray(cv2.HoughLinesP(binary_mask, 1, np.pi/2, 100, minLineLength=50, maxLineGap=10))
    
     # Filter the lines into the four lists
-    if lines is not None:
+    if lines.dtype == np.int32:
       for line in lines:
         x1, y1, x2, y2 = line[0]
-                
-        if x1 < binary_mask_middle - segmented_image_width and x2 < binary_mask_middle - segmented_image_width:
-              far_left.append(line[0])
-        elif x1 < binary_mask_middle and x2 < binary_mask_middle:
-              left.append(line[0])
-        elif x1 > binary_mask_middle and x2 > binary_mask_middle:
-              right.append(line[0])
-        elif x1 > binary_mask_middle + segmented_image_width and x2 > binary_mask_middle + segmented_image_width:
-              far_right.append(line[0])
+        xAxis = np.mean([x1, x2])
 
-    return np.asarray(far_left), np.asarray(left), np.asarray(right), np.asarray(far_right)
-  
+        if xAxis > 0 and xAxis < middle_lane-segmented_width:
+              far_left_line.append(line[0])
+        elif xAxis > middle_lane-segmented_width and xAxis < middle_lane:
+              left_line.append(line[0])
+        elif xAxis > middle_lane and xAxis < middle_lane + segmented_width:
+              right_line.append(line[0])
+        elif xAxis > middle_lane + segmented_width:
+              far_right_line.append(line[0])
+
+
+    return np.asarray(far_left_line), np.asarray(left_line), np.asarray(right_line), np.asarray(far_right_line)
+    
+  ## Ge the highest and lowest x and y values for a given line
+  def get_straight_Line(self, line):
+         
+    if line.size > 0:
+      straight_line = np.array([np.max(line[:, 0]), np.max(line[:, 1]), np.min(line[:, 2]), np.min(line[:, 3])])
+
+      return straight_line
+
+  ## Get the angle for a given line
+  def get_perLine_angle(self, line):
+      
+      if line.size > 0:
+            angle = np.mean(np.arctan2(abs(line[:, 0]) - abs(line[:, 2]), abs(line[:, 1]) - abs(line[:, 3])))
+            return angle
+
+  # Get the angle for each line
   def get_angles(self, far_left, left, right, far_right):
-    # Determine the angle for list of lines
-    # Store the angles in the class variables self.far_left_angle, self.left_angle, self.right_angle, self.far_right_angle
-    # Return the four angles
-    # Get the angle for each line
 
     if left.size > 0:
-      self.left_angle = np.mean(np.arctan2(left[:, 3] - left[:, 1], left[:, 2] - left[:, 0]))
-      print("left angle: ", self.left_angle)
-
+          self.left_angle = self.get_perLine_angle(left)
+          print("left angle: ", self.left_angle)
+    
     if right.size > 0:
-      self.right_angle = np.mean(np.arctan2(right[:, 3] - right[:, 1], right[:, 2] - right[:, 0]))
-      print("right angle: ", self.right_angle)
+          self.right_angle = self.get_perLine_angle(right)
+          print("right angle: ", self.right_angle)
+    
+    if far_left.size > 0:
+          self.far_left_angle = self.get_perLine_angle(far_left)
+          print("far left angle: ", self.far_left_angle)
 
+    if far_right.size > 0:
+          self.far_right_angle = self.get_perLine_angle(far_right)
+          print("far right angle: ", self.far_right_angle)
 
-
+  
   def send_velocity(self, omega): 
     # Create a Twist message
     msg = Twist()
@@ -131,18 +151,6 @@ class LaneFollower(object):
     if key == ord('s'): # Pressing 's' will save the image
       cv2.imwrite("lane_follower_image.png", image)
 
-  # # Draw the four lines (Far left, Left, Right, and Far right), and 
-  # # put the text of each line on the image
-  # def draw_info(self, image, middle, width):
-  #   # Draw the four lines
-  #   self.draw_line(image, [middle, 0, middle, 400])
-
-  
-  # # Put text on the image  
-  # def put_text(self, image, position, text ="", color=(255, 255, 255)):
-  #   cv2.putText(image, text, position, cv2.FONT_HERSHEY_COMPLEX, 0.6, color)
-  
-
 
   # Image callback function, gets called at 10Hz 
   def image_callback(self, image_msg):
@@ -164,13 +172,13 @@ class LaneFollower(object):
     hsv_image = self.to_hsv(warped_image)
     filtered_hsv_image = self.filter_hsv(hsv_image, self.hsv_lower_values, self.hsv_upper_values)
 
-    warped_image_copy = warped_image.copy()
 
 
     # Filter the lines to determine which lane they belong to
     far_left, left, right, far_right = self.get_lines(filtered_hsv_image)
 
-    # Draw the Probabilistic Line Transform. 
+    ## Draw the Probabilistic Line Transform. 
+    warped_image_copy = warped_image.copy()
     for line in far_left:
           self.draw_line(warped_image_copy, line)
 
@@ -182,22 +190,51 @@ class LaneFollower(object):
 
     for line in far_right:
           self.draw_line(warped_image_copy, line)
-    # print("far_left: ", far_left)
+
+    # self.draw_line(warped_image_copy, self.get_straight_Line(left))
+    ## draw a stripe of single straight line
+    # self.draw_line(warped_image_copy, self.get_straight_Line(right))
+    # self.draw_line(warped_image_copy, self.get_straight_Line(far_left))
+    # self.draw_line(warped_image_copy, self.get_straight_Line(far_right))
 
     # showing the warped image
     self.show_image("filtered_hsv_image", warped_image_copy)
     
+    # Determine the angles of each line
     self.get_angles(far_left, left, right, far_right)
 
-    # self.draw_lines(filtered_hsv_image, right)
-    # self.draw_lines(filtered_hsv_image, far_right)
 
-    # self.draw_info(filtered_hsv_image, middle, segment_width)
+    # Determine the error for the P controller. This error should depend on which lane you want to follow.
+    # Use the center of the left lane as the error for the rotational P-controller. 
+    # I.e. move the center of the image towards the middle of the left lane.
+    # If there is no far left line anymore (because the robot has moved towards the left,
+    # resume normal lane following (by again using the left and right lines for the
+    # calculation of the middle of the lane).
+    # The robot should now have switched lanes, and the current lane is now
+    # considered the center lane.
+    #####
+    # # Remember that the image_callback gets updated at 5Hz, the robot should only send 
+    # one velocity command per image update.
+    #####
 
-    
-    # Determine the angles of each line
-    # Determine the error for the P controller. This error should depend on which 
-      #  lane you want to follow.
+    # Determine the error for the P controller. This error should depend on which lane you want to follow.
+    # Use the center of the left lane as the error for the rotational P-controller.
+    # I.e. move the center of the image towards the middle of the left lane.
+    # If there is no far left line anymore (because the robot has moved towards the left,
+    # resume normal lane following (by again using the left and right lines for the
+    # calculation of the middle of the lane).
+    # The robot should now have switched lanes, and the current lane is now
+    # considered the center lane.
+    #####
+    # # Remember that the image_callback gets updated at 5Hz, the robot should only send
+    # one velocity command per image update.
+    #####
+  
+
+
+
+
+
     # Determine the rotational velocity
     # Send velocity
 
