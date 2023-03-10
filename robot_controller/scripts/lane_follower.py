@@ -59,10 +59,7 @@ class LaneFollower(object):
   # Get all the lines form the HSV image, and separate the lines into far_left_line, 
   # left_line, right_line, far_right_line
   def get_lines(self, binary_mask):
-        # Filter each line to determine to which lane in belongs to 
-    # Return far_left, left, right, far_right
-    # Get lists of all four lines
-    
+        
     _, binary_mask_width = binary_mask.shape
     middle_lane = binary_mask_width / 2
     segmented_width = middle_lane / 2
@@ -92,7 +89,6 @@ class LaneFollower(object):
     
   ## Ge the highest and lowest x and y values for a given line
   def get_straight_Line(self, line):
-         
     if line.size > 0:
       straight_line = np.array([np.max(line[:, 0]), np.max(line[:, 1]), np.min(line[:, 2]), np.min(line[:, 3])])
 
@@ -100,25 +96,23 @@ class LaneFollower(object):
 
   ## Get the angle for a given line
   def get_perLine_angle(self, line):
-      
       if line.size > 0:
             angle = np.mean(np.arctan2(abs(line[:, 0]) - abs(line[:, 2]), abs(line[:, 1]) - abs(line[:, 3])))
             return angle
 
   # Get the angle for each line
   def get_angles(self, far_left, left, right, far_right):
-
     if left.size > 0:
           self.left_angle = self.get_perLine_angle(left)
-          print("left angle: ", self.left_angle)
+          # print("left angle: ", self.left_angle)
     
     if right.size > 0:
           self.right_angle = self.get_perLine_angle(right)
-          print("right angle: ", self.right_angle)
+          # print("right angle: ", self.right_angle)
     
     if far_left.size > 0:
           self.far_left_angle = self.get_perLine_angle(far_left)
-          print("far left angle: ", self.far_left_angle)
+          # print("far left angle: ", self.far_left_angle)
 
     if far_right.size > 0:
           self.far_right_angle = self.get_perLine_angle(far_right)
@@ -127,12 +121,16 @@ class LaneFollower(object):
   
   def send_velocity(self, omega): 
     # Create a Twist message
-    msg = Twist()
-  
-    # Limit the rotational velocity to (-)0.5 rad/s, this will help with switching lanes
     # For the forward velocity use the self.forward_velocity variable
     # use the self.cmd_vel_publisher to publish the velocity
+    # Limit the rotational velocity to (-)0.5 rad/s, this will help with switching lanes
+
+    msg = Twist()
+    msg.linear.x = self.forward_speed
+    msg.angular.z = omega
     self.cmd_vel_publisher.publish(msg)
+  
+
 
 
   ## Draw a blue overlay line on the image
@@ -150,6 +148,46 @@ class LaneFollower(object):
       rospy.signal_shutdown("exit")
     if key == ord('s'): # Pressing 's' will save the image
       cv2.imwrite("lane_follower_image.png", image)
+
+  # Calculate the rotational velocity
+  def calculate_omega(self, mean_left, mean_right, width):
+    # mean_left and mean_right are the mean x values for the left_line and right_line, 
+    # width is the (optional) width of the image, in case you want to normalize the error
+
+    # Calculate omega with (self.forward_speed * Kp) * error
+    # You need to define the Kp and error yourself.
+    # Limit the omega to be between -0.5 and 0.5 rad/s.
+    
+    # proportional_controller
+    centerLane = (mean_left+mean_right)/2
+    error = width - centerLane
+
+    kp = 0
+    if self.forward_speed == 1.2:
+      if error > 100 or error < -100:
+        kp = 0.00602 
+    elif self.forward_speed >= 0.7 and self.forward_speed <= 0.8:
+        kp =  0.015
+    elif self.forward_speed >= 0.9 and self.forward_speed <= 1.0:
+        kp =   0.0095
+    elif self.forward_speed == 1.1:
+        kp =   0.007
+    elif self.forward_speed == 0.1:
+          kp = 0.3
+    elif self.forward_speed == 0.2:
+          kp = 0.2
+    elif self.forward_speed == 0.3:
+          kp = 0.08
+    elif self.forward_speed == 0.4:
+          kp = 0.05
+    elif self.forward_speed == 0.5:
+          kp = 0.028
+    elif self.forward_speed == 0.6:
+          kp = 0.018
+
+    print("kp: ", kp)
+    omega = (self.forward_speed * kp) * error
+    return omega
 
 
   # Image callback function, gets called at 10Hz 
@@ -191,8 +229,8 @@ class LaneFollower(object):
     for line in far_right:
           self.draw_line(warped_image_copy, line)
 
-    # self.draw_line(warped_image_copy, self.get_straight_Line(left))
-    ## draw a stripe of single straight line
+    ## Get a stripe of single straight line
+    self.draw_line(warped_image_copy, self.get_straight_Line(left))
     # self.draw_line(warped_image_copy, self.get_straight_Line(right))
     # self.draw_line(warped_image_copy, self.get_straight_Line(far_left))
     # self.draw_line(warped_image_copy, self.get_straight_Line(far_right))
@@ -217,25 +255,35 @@ class LaneFollower(object):
     # one velocity command per image update.
     #####
 
-    # Determine the error for the P controller. This error should depend on which lane you want to follow.
-    # Use the center of the left lane as the error for the rotational P-controller.
-    # I.e. move the center of the image towards the middle of the left lane.
-    # If there is no far left line anymore (because the robot has moved towards the left,
-    # resume normal lane following (by again using the left and right lines for the
-    # calculation of the middle of the lane).
-    # The robot should now have switched lanes, and the current lane is now
-    # considered the center lane.
-    #####
-    # # Remember that the image_callback gets updated at 5Hz, the robot should only send
-    # one velocity command per image update.
-    #####
-  
+    mean_left, mean_right, mean_far_left, mean_far_right = 0, 0, 0, 0
+    # Determine the mean x value for the left and right line
+    if left.any():
+        mean_left = np.mean([line[0] for line in left])
+    if right.any():
+        mean_right = np.mean([line[0] for line in right])
+    if far_left.any():
+        mean_far_left = np.mean([line[0] for line in far_left])
+    if far_right.any():
+        mean_far_right = np.mean([line[0] for line in far_right])
 
+    print("mean_left: ", mean_left)
+    print("mean_right: ", mean_right)
+    print("mean_far_left: ", mean_far_left)
+    print("mean_far_right: ", mean_far_right)
 
-
-
-
+    
     # Determine the rotational velocity
+    omega = self.calculate_omega(mean_left, mean_right, middle)
+    print(omega)
+
+
+    # Send the velocity command
+    self.send_velocity(omega)
+
+
+
+
+
     # Send velocity
 
 
