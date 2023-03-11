@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from geometry_msgs.msg import Twist
 
+
 class LaneFollower(object):
 
   def __init__(self, forward_speed):
@@ -67,7 +68,7 @@ class LaneFollower(object):
     # # Declare the lines
     far_left_line, left_line, right_line, far_right_line = [], [], [], []
     # Find all the lines using cv2.HoughLinesP function
-    lines = np.asarray(cv2.HoughLinesP(binary_mask, 1, np.pi/2, 100, minLineLength=50, maxLineGap=10))
+    lines = np.asarray(cv2.HoughLinesP(binary_mask, 0.75, np.pi/180, threshold=140, minLineLength=100, maxLineGap=20))
    
     # Filter the lines into the four lists
     if lines.dtype == np.int32:
@@ -90,40 +91,49 @@ class LaneFollower(object):
   ## Ge the highest and lowest x and y values for a given line
   def get_straight_Line(self, line):
     if line.size > 0:
-      straight_line = np.array([np.max(line[:, 0]), np.max(line[:, 1]), np.min(line[:, 2]), np.min(line[:, 3])])
+      # straight_line = np.array([np.max(line[:, 0]), np.max(line[:, 1]), np.min(line[:, 2]), np.min(line[:, 3])])
+      # new_line2 = np.array([233, 299, 233, 0]) # Ideal straight line
+      straight_line = np.array([int(np.mean(line[:, 0])), np.max(line[:, 1]), int(np.mean(line[:, 2])), np.min(line[:, 3])])
+      # print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+      # print("line: ", line)
+      # print("straight_line:", straight_line)
+      # print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
       return straight_line
 
   ## Get the angle for a given line
   def get_perLine_angle(self, line):
       if line.size > 0:
-            angle = np.mean(np.arctan2(abs(line[:, 0]) - abs(line[:, 2]), abs(line[:, 1]) - abs(line[:, 3])))
+            angle = np.arctan2(abs(line[0]) - abs(line[2]), abs(line[1]) - abs(line[3]))
             return angle
 
   # Get the angle for each line
   def get_angles(self, far_left, left, right, far_right):
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     if left.size > 0:
-          self.left_angle = self.get_perLine_angle(left)
-          # print("left angle: ", self.left_angle)
+          # self.left_angle = self.get_perLine_angle(left[0])
+          self.left_angle = self.get_perLine_angle(self.get_straight_Line(left))
+          print("left angle: ", self.left_angle)
     
     if right.size > 0:
-          self.right_angle = self.get_perLine_angle(right)
-          # print("right angle: ", self.right_angle)
+          self.right_angle = self.get_perLine_angle(self.get_straight_Line(right))
+          print("right angle: ", self.right_angle)
     
     if far_left.size > 0:
-          self.far_left_angle = self.get_perLine_angle(far_left)
-          # print("far left angle: ", self.far_left_angle)
+          self.far_left_angle = self.get_perLine_angle(self.get_straight_Line(far_left))
+          print("far left angle: ", self.far_left_angle)
 
     if far_right.size > 0:
-          self.far_right_angle = self.get_perLine_angle(far_right)
+          self.far_right_angle = self.get_perLine_angle(self.get_straight_Line(far_right))
           print("far right angle: ", self.far_right_angle)
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
   
   def send_velocity(self, omega): 
-    # Create a Twist message
-    # For the forward velocity use the self.forward_velocity variable
-    # use the self.cmd_vel_publisher to publish the velocity
-    # Limit the rotational velocity to (-)0.5 rad/s, this will help with switching lanes
+    # # Create a Twist message
+    # # For the forward velocity use the self.forward_velocity variable
+    # # use the self.cmd_vel_publisher to publish the velocity
+    # # Limit the rotational velocity to (-)0.5 rad/s, this will help with switching lanes
 
     msg = Twist()
     msg.linear.x = self.forward_speed
@@ -160,6 +170,7 @@ class LaneFollower(object):
     
     # proportional_controller
     centerLane = (mean_left+mean_right)/2
+
     error = width - centerLane
 
     kp = 0
@@ -185,7 +196,7 @@ class LaneFollower(object):
     elif self.forward_speed == 0.6:
           kp = 0.018
 
-    print("kp: ", kp)
+    # print("kp: ", kp)
     omega = (self.forward_speed * kp) * error
     return omega
 
@@ -206,75 +217,63 @@ class LaneFollower(object):
     middle = warped_image_width / 2 # Determine the center of the image 
     segment_width = middle / 2 # Determine the width of each segment of the image
     
-    # Convert and filter HSV (use the calibrator to find correct HSV filter values)
+    ## Convert and filter HSV (use the calibrator to find correct HSV filter values)
     hsv_image = self.to_hsv(warped_image)
     filtered_hsv_image = self.filter_hsv(hsv_image, self.hsv_lower_values, self.hsv_upper_values)
 
-
-
-    # Filter the lines to determine which lane they belong to
+    ## Filter the lines to determine which lane they belong to
     far_left, left, right, far_right = self.get_lines(filtered_hsv_image)
 
-    ## Draw the Probabilistic Line Transform. 
+    ## Make a copy of the warped image to draw the lines on
     warped_image_copy = warped_image.copy()
-    for line in far_left:
-          self.draw_line(warped_image_copy, line)
 
-    for line in left:
-          self.draw_line(warped_image_copy, line)
-
-    for line in right:
-          self.draw_line(warped_image_copy, line)
-
-    for line in far_right:
-          self.draw_line(warped_image_copy, line)
-
+    # ## Draw the Probabilistic Line Transform. 
+    # for line in left:
+    #       self.draw_line(warped_image_copy, line)
+    # for line in far_left:
+    #       self.draw_line(warped_image_copy, line)
+    # for line in right:
+    #       self.draw_line(warped_image_copy, line)
+    # for line in far_right:
+    #       self.draw_line(warped_image_copy, line)
+    
+    
     ## Get a stripe of single straight line
     self.draw_line(warped_image_copy, self.get_straight_Line(left))
-    # self.draw_line(warped_image_copy, self.get_straight_Line(right))
-    # self.draw_line(warped_image_copy, self.get_straight_Line(far_left))
-    # self.draw_line(warped_image_copy, self.get_straight_Line(far_right))
+    self.draw_line(warped_image_copy, self.get_straight_Line(right))
+    self.draw_line(warped_image_copy, self.get_straight_Line(far_left))
+    self.draw_line(warped_image_copy, self.get_straight_Line(far_right))
 
-    # showing the warped image
+    ## showing the warped image
     self.show_image("filtered_hsv_image", warped_image_copy)
-    
-    # Determine the angles of each line
+
+    ## Determine the angles of each line
     self.get_angles(far_left, left, right, far_right)
-
-
-    # Determine the error for the P controller. This error should depend on which lane you want to follow.
-    # Use the center of the left lane as the error for the rotational P-controller. 
-    # I.e. move the center of the image towards the middle of the left lane.
-    # If there is no far left line anymore (because the robot has moved towards the left,
-    # resume normal lane following (by again using the left and right lines for the
-    # calculation of the middle of the lane).
-    # The robot should now have switched lanes, and the current lane is now
-    # considered the center lane.
-    #####
-    # # Remember that the image_callback gets updated at 5Hz, the robot should only send 
-    # one velocity command per image update.
-    #####
-
-    mean_left, mean_right, mean_far_left, mean_far_right = 0, 0, 0, 0
-    # Determine the mean x value for the left and right line
-    if left.any():
-        mean_left = np.mean([line[0] for line in left])
-    if right.any():
-        mean_right = np.mean([line[0] for line in right])
-    if far_left.any():
-        mean_far_left = np.mean([line[0] for line in far_left])
-    if far_right.any():
-        mean_far_right = np.mean([line[0] for line in far_right])
-
-    print("mean_left: ", mean_left)
-    print("mean_right: ", mean_right)
-    print("mean_far_left: ", mean_far_left)
-    print("mean_far_right: ", mean_far_right)
-
     
-    # Determine the rotational velocity
+
+    ## Determine the mean x value for the left, right, far_left and far_right line 
+    mean_left, mean_right, mean_far_left, mean_far_right = 0, 0, 0, 0
+    if left.any():
+        mean_left = int(np.mean((self.get_straight_Line(left))[[0, 2]]))
+    if right.any():
+        mean_right = int(np.mean((self.get_straight_Line(right))[[0, 2]]))
+    if far_left.any():
+        mean_far_left = int(np.mean((self.get_straight_Line(far_left))[[0, 2]]))
+    if far_right.any():
+        mean_far_right = int(np.mean((self.get_straight_Line(far_right))[[0, 2]]))
+    
+    ## calculate the omega
     omega = self.calculate_omega(mean_left, mean_right, middle)
-    print(omega)
+
+    ## Lane switching
+
+
+
+
+
+
+
+
 
 
     # Send the velocity command
