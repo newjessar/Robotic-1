@@ -33,7 +33,7 @@ class Controller(object):
         self.forward_speed = 0.7
         self.lane_follower.forward_speed = 0.7
     elif speed_msg.speed >= 1.2:
-        print("#########################################################", speed_msg.speed)
+
         self.forward_speed = 1.2
         self.lane_follower.forward_speed = 1.2
     else:
@@ -41,8 +41,6 @@ class Controller(object):
         pass
 
 
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Setting speed to: ", self.lane_follower.forward_speed)
-    
     return SetSpeedResponse(speed_msg)
   
   # Command via terminal to call this function: rosservice call /switch_left
