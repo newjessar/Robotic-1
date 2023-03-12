@@ -10,7 +10,7 @@ from bot_message.srv import SetSpeed, SetSpeedResponse
 class Controller(object):
 
   def __init__(self):
-    self.forward_speed = 0.7 # Set the starting forward speed, DO NOT CHANGE
+    self.forward_speed = 1.2 # Set the starting forward speed, DO NOT CHANGE
     self.lane_follower = LaneFollower(self.forward_speed)
     self.object_tracker = ObjectTracker()
     self.laser_data = LaserData(self.laser_callback)
@@ -28,22 +28,39 @@ class Controller(object):
     # Max forward speed should be 1.2 m/s
     # Update forward speed
     # Update lane follower forward speed 
-    velocity = max(0.0, min(speed_msg.speed, 1.2))
-    self.forward_speed = velocity
-    self.lane_follower.forward_speed = velocity
     
-    return SetSpeedResponse()
+    if speed_msg.speed <= 0.7:
+        self.forward_speed = 0.7
+        self.lane_follower.forward_speed = 0.7
+    elif speed_msg.speed >= 1.2:
+        print("#########################################################", speed_msg.speed)
+        self.forward_speed = 1.2
+        self.lane_follower.forward_speed = 1.2
+    else:
+        # reject any other speed values
+        pass
+
+
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Setting speed to: ", self.lane_follower.forward_speed)
+    
+    return SetSpeedResponse(speed_msg)
   
   # Command via terminal to call this function: rosservice call /switch_left
   def initiate_switch_left(self, empty_msg):
     # Check line angles to see if you can switch lanes
     # Start the lane switching
+
+    self.lane_follower.switch_left = True
+
     return EmptyResponse()
   
   # Command via terminal to call this function: rosservice call /switch_right
   def initiate_switch_right(self, empty_msg):
     # Check line angles to see if you can switch lanes
     # Start the lane switching
+
+    self.lane_follower.switch_right = True
+
     return EmptyResponse()
 
   # Laser callback function, gets called at 10Hz

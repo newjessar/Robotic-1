@@ -10,6 +10,7 @@ class LaneFollower(object):
 
   def __init__(self, forward_speed):
     self.forward_speed = forward_speed
+
     self.cv_bridge = CvBridge()
     rospy.on_shutdown(self.on_shutdown)
 
@@ -31,7 +32,14 @@ class LaneFollower(object):
     self.left_angle = 0
     self.right_angle = 0
     self.far_right_angle = 0
+
+    ## Lane swtiching Untility
+
+    self.switch_left = False
+    self.switch_right = False
+
     self.image_subscriber = rospy.Subscriber(image_topic, Image, self.image_callback, queue_size=1)
+
   def on_shutdown(self):
     twist_msg = Twist()
     self.cmd_vel_publisher.publish(twist_msg)
@@ -68,7 +76,7 @@ class LaneFollower(object):
     # # Declare the lines
     far_left_line, left_line, right_line, far_right_line = [], [], [], []
     # Find all the lines using cv2.HoughLinesP function
-    lines = np.asarray(cv2.HoughLinesP(binary_mask, 0.75, np.pi/180, threshold=140, minLineLength=100, maxLineGap=20))
+    lines = np.asarray(cv2.HoughLinesP(binary_mask, 0.75, np.pi/180, 100, 100, 10))
    
     # Filter the lines into the four lists
     if lines.dtype == np.int32:
@@ -109,24 +117,32 @@ class LaneFollower(object):
 
   # Get the angle for each line
   def get_angles(self, far_left, left, right, far_right):
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    # print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     if left.size > 0:
           # self.left_angle = self.get_perLine_angle(left[0])
           self.left_angle = self.get_perLine_angle(self.get_straight_Line(left))
-          print("left angle: ", self.left_angle)
+          # print("left angle: ", self.left_angle)
+    else:
+          self.left_angle = 0.0
     
     if right.size > 0:
           self.right_angle = self.get_perLine_angle(self.get_straight_Line(right))
-          print("right angle: ", self.right_angle)
+          # print("right angle: ", self.right_angle)
+    else:
+          self.right_angle = 0.0
     
     if far_left.size > 0:
           self.far_left_angle = self.get_perLine_angle(self.get_straight_Line(far_left))
-          print("far left angle: ", self.far_left_angle)
+          # print("far left angle: ", self.far_left_angle)
+    else:
+          self.far_left_angle = 0.0
 
     if far_right.size > 0:
           self.far_right_angle = self.get_perLine_angle(self.get_straight_Line(far_right))
-          print("far right angle: ", self.far_right_angle)
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+          # print("far right angle: ", self.far_right_angle)
+    else:
+          self.far_right_angle = 0.0
+    # print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
   
   def send_velocity(self, omega): 
@@ -170,10 +186,10 @@ class LaneFollower(object):
     
     # proportional_controller
     centerLane = (mean_left+mean_right)/2
-
     error = width - centerLane
-
     kp = 0
+    omega = 0
+
     if self.forward_speed == 1.2:
       if error > 100 or error < -100:
         kp = 0.00602 
@@ -196,13 +212,45 @@ class LaneFollower(object):
     elif self.forward_speed == 0.6:
           kp = 0.018
 
-    # print("kp: ", kp)
+
+    # print("speed", self.forward_speed, "kp", kp, "error: ", error)
     omega = (self.forward_speed * kp) * error
+    # print("omega", omega)
     return omega
+    
+    # (1) the robot is currently not in a turn and 
+    # (2) there is another lane to switch to.
+    # The function must also check the bool value self.switching_left and switching_right if its true 
+    # The function must also check if the angles corrspond to the line that is being switched to must be 0.0
+    # after the switch the function must set the self.switching_left and switching_right to false
+    # in case the swtiiching is not possible then there is no need to do anything
+  def lane_switcher(self, mean, mean_far, width):
+    
+    if self.switch_left:
+        print("left_angle: ", self.left_angle, "far_left_angle: ", self.far_left_angle)
+        if self.left_angle == 0.0 and self.far_left_angle == 0.0:
+          if mean_far != None and mean != None:
+            omega = self.calculate_omega(mean_far, mean, width)
+            return omega
+          
+          elif self.left_angle == 0.0:
+                self.switch_left = False
+    
+    if self.switch_right:
+        if self.right_angle == 0.0 and self.far_right_angle == 0.0:
+          if mean_far != None and mean != None:
+            omega = self.calculate_omega(mean, mean_far, width)
+            return omega
+
+          elif self.right_angle == 0.0:
+                self.switch_right = False
+          
 
 
   # Image callback function, gets called at 10Hz 
   def image_callback(self, image_msg):
+    # print("forward speed: ", self.forward_speed)
+
         # Convert the sensor_msgs Image to OpenCv image
     # An OpenCV image has the color channels in order BGR (instead of the more common RGB)
     image = self.cv_bridge.imgmsg_to_cv2(image_msg, "bgr8") 
@@ -252,30 +300,78 @@ class LaneFollower(object):
     
 
     ## Determine the mean x value for the left, right, far_left and far_right line 
-    mean_left, mean_right, mean_far_left, mean_far_right = 0, 0, 0, 0
+    mean_left, mean_right, mean_far_left, mean_far_right = None, None, None, None
     if left.any():
         mean_left = int(np.mean((self.get_straight_Line(left))[[0, 2]]))
+    else:
+        mean_left = None
     if right.any():
         mean_right = int(np.mean((self.get_straight_Line(right))[[0, 2]]))
+    else:
+        mean_right = None
     if far_left.any():
         mean_far_left = int(np.mean((self.get_straight_Line(far_left))[[0, 2]]))
+    else:
+        mean_far_left = None
     if far_right.any():
         mean_far_right = int(np.mean((self.get_straight_Line(far_right))[[0, 2]]))
-    
+    else:
+        mean_far_right = None
+
+    omega = 0.0
     ## calculate the omega
-    omega = self.calculate_omega(mean_left, mean_right, middle)
+    if mean_left != None and mean_right != None:
+        omega = self.calculate_omega(mean_left, mean_right, middle)
+    
+    elif mean_left == None and mean_right != None:
+        omega = self.calculate_omega(0, mean_right, middle)   
+          
+    elif mean_left != None and mean_right == None:
+        omega = self.calculate_omega(mean_left, 0, middle)
 
+    # print("mean_left: ", mean_left, "mean_right: ", mean_right, "mean_far_left: ", mean_far_left, "mean_far_right: ", mean_far_right)
+    # print("left_angle: ", self.left_angle, "right_angle: ", self.right_angle, "far_left_angle: ", self.far_left_angle, "far_right_angle: ", self.far_right_angle)
+    
     ## Lane switching
+    if self.switch_left == True:
+      print("%%%%%%%%%%%%%%%%%%%%%%%%%%   Switch Left ")
+      if mean_far_left != None:
+          if(self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_right_angle == 0.0):
+              print("######################## First ########################")    
+              print("mean_left: ", mean_left, "mean_right: ", mean_right, "mean_far_left: ", mean_far_left, "mean_far_right: ", mean_far_right)
+              print("left_angle: ", self.left_angle, "right_angle: ", self.right_angle, "far_left_angle: ", self.far_left_angle, "far_right_angle: ", self.far_right_angle)
+              print("Omega >>>>>>>>>>>>>> mean_left: ", mean_left, "mean_far_left: ", mean_far_left)
+              omega = self.lane_switcher(mean_left, mean_far_left, middle)
+      else:
+          if mean_far_right != None:
+            print("+++++++++++++++++++++++++++++++++   Else: left   ++++++++++++++++++++++++++++++++++++++++++++++")
+            self.switch_left = False
+            self.far_right_angle = 0.0
 
 
+    if self.switch_right == True:
+      print("%%%%%%%%%%%%%%%%%%%%%%%%%%   Switch right ")
+      if mean_far_right != None:
+          if(self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_left_angle == 0.0):
+              print("+++++++++++++++++++++++++++++++++   Second   ++++++++++++++++++++++++++++++++++++++++++++++")
+              print("mean_left: ", mean_left, "mean_right: ", mean_right, "mean_far_left: ", mean_far_left, "mean_far_right: ", mean_far_right)
+              print("left_angle: ", self.left_angle, "right_angle: ", self.right_angle, "far_left_angle: ", self.far_left_angle, "far_right_angle: ", self.far_right_angle)
+              omega = self.lane_switcher(mean_right, mean_far_right, middle)
+      else:
+          if mean_far_left != None:
+            print("+++++++++++++++++++++++++++++++++   Else: right   ++++++++++++++++++++++++++++++++++++++++++++++")
+            self.switch_right = False
+            self.far_left_angle = 0.0
+    # else:
+    #       print("--------------------------------------------------- No turn")
 
+    if omega == None:
+          omega = 0.0
 
+    if omega == -0.0:
+          omega = 0.0
 
-
-
-
-
-
+    # print("omega Down: ", omega)
     # Send the velocity command
     self.send_velocity(omega)
 
