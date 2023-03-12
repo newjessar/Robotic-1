@@ -10,7 +10,7 @@ from bot_message.srv import SetSpeed, SetSpeedResponse
 class Controller(object):
 
   def __init__(self):
-    self.forward_speed = 1.2 # Set the starting forward speed, DO NOT CHANGE
+    self.forward_speed = 0.7 # Set the starting forward speed, DO NOT CHANGE
     self.lane_follower = LaneFollower(self.forward_speed)
     self.object_tracker = ObjectTracker()
     self.laser_data = LaserData(self.laser_callback)
