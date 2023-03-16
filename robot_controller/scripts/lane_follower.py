@@ -268,10 +268,8 @@ class LaneFollower(object):
     ## Filter the lines to determine which lane they belong to
     far_left, left, right, far_right = self.get_lines(filtered_hsv_image)
 
-
     ## Make a copy of the warped image to draw the lines on
     warped_image_copy = warped_image.copy()
-          
           
     # draw the lines on the warped image copy
     # Concatenate all non-empty line arrays
