@@ -4,6 +4,7 @@ from cv_bridge import CvBridge
 import cv2
 import numpy as np
 from geometry_msgs.msg import Twist
+from math import atan2
 
 
 class LaneFollower(object):
@@ -64,8 +65,8 @@ class LaneFollower(object):
     cropped_image = warped_image[500:800, 500:1100] # DO NOT CHANGE 
     return cropped_image
   
-  # Get all the lines form the HSV image, and separate the lines into far_left_line, 
-  # left_line, right_line, far_right_line
+  # Get all the lines form the HSV image, and separate the lines into far_left, 
+  # left, right, far_right
   def get_lines(self, binary_mask):
         
     _, binary_mask_width = binary_mask.shape
@@ -73,47 +74,66 @@ class LaneFollower(object):
     segmented_width = middle_lane / 2
 
     # # Declare the lines
-    far_left_line, left_line, right_line, far_right_line = [], [], [], []
+    far_left, left, right, far_right = [], [], [], []
     # Find all the lines using cv2.HoughLinesP function
-    lines = np.asarray(cv2.HoughLinesP(binary_mask, 0.75, np.pi/180, 100, 100, 10))
+    # lines = np.asarray(cv2.HoughLinesP(binary_mask, 0.3, np.pi/180, 70, 100, 5))
+
+    # Assuming 'image' is your grayscale input image
+    lsd = cv2.createLineSegmentDetector(0)
+    flo_lines, width, prec, nfa = lsd.detect(binary_mask)
+
+    # Round the coordinates to the nearest integer and convert them to integers
+    lines = np.round(flo_lines).astype(np.int32)
+
    
     # Filter the lines into the four lists
-    if lines.dtype == np.int32:
-      for line in lines:
-        x1, y1, x2, y2 = line[0]
-        xAxis = np.mean([x1, x2])
+    if lines.any():
+      
+        for line in lines:
+              
+          x1, y1, x2, y2 = line[0]
+          xAxis = ((x1+ x2)/2)
+          
+          if xAxis > 0 and xAxis < middle_lane-segmented_width:
+                far_left.append(line[0])
+          elif xAxis > middle_lane-segmented_width and xAxis < middle_lane:
+                left.append(line[0])
+          elif xAxis > middle_lane and xAxis < middle_lane + segmented_width:
+                right.append(line[0])
+          elif xAxis > middle_lane + segmented_width:
+                far_right.append(line[0])
 
-        if xAxis > 0 and xAxis < middle_lane-segmented_width:
-              far_left_line.append(line[0])
-        elif xAxis > middle_lane-segmented_width and xAxis < middle_lane:
-              left_line.append(line[0])
-        elif xAxis > middle_lane and xAxis < middle_lane + segmented_width:
-              right_line.append(line[0])
-        elif xAxis > middle_lane + segmented_width:
-              far_right_line.append(line[0])
-
-
-    return np.asarray(far_left_line), np.asarray(left_line), np.asarray(right_line), np.asarray(far_right_line)
+    return np.asarray(far_left), np.asarray(left), np.asarray(right), np.asarray(far_right)
+  
     
   ## Ge the highest and lowest x and y values for a given line
   def get_straight_Line(self, line):
-        
     if line.size > 0:
-      straight_line = np.array([int(np.mean(line[:, 0])), np.max(line[:, 1]), int(np.mean(line[:, 2])), np.min(line[:, 3])])
+      # Calculate the sum of x1 and x2 for each line
+      x_sums = line[:, 0] + line[:, 2]
+      # Get the lines with the minimum and maximum x sums
+      min_line = line[np.argmin(x_sums)]
+      max_line = line[np.argmax(x_sums)]
 
-      return straight_line
+      # print("Line with maximum x1 + x2:", max_line)
+      # print("Line with minimum x1 + x2:", min_line)
+
+      return max_line
 
   ## Get the angle for a given line
   def get_perLine_angle(self, line):
       if line.size > 0:
-            angle = np.arctan2(abs(line[0]) - abs(line[2]), abs(line[1]) - abs(line[3]))
-            return angle
+            angle = atan2(abs(line[0]) - abs(line[2]), abs(line[1]) - abs(line[3]))
+            # print("Angle:", angle)
+            if angle < 0.0:
+                return 0.0
+            else:
+              return angle
 
   # Get the angle for each line
   def get_angles(self, far_left, left, right, far_right):
     if left.size > 0:
           self.left_angle = self.get_perLine_angle(self.get_straight_Line(left))
-
     else:
           self.left_angle = 0.0
     
@@ -163,7 +183,7 @@ class LaneFollower(object):
 
   # Calculate the rotational velocity
   def calculate_omega(self, mean_left, mean_right, width):
-    # mean_left and mean_right are the mean x values for the left_line and right_line, 
+    # mean_left and mean_right are the mean x values for the left and right, 
     # width is the (optional) width of the image, in case you want to normalize the error
 
     # Calculate omega with (self.forward_speed * Kp) * error
@@ -173,16 +193,19 @@ class LaneFollower(object):
     # proportional_controller
     centerLane = (mean_left+mean_right)/2
     error = width - centerLane
-    kp = 0
+    kp = 0.01
     omega = 0
 
+
     if self.forward_speed == 1.2:
-      if error > 100 or error < -100:
-        kp = 0.00602 
-    elif self.forward_speed >= 0.7 and self.forward_speed <= 0.8:
-        kp =  0.015
+        kp = 0.01
+    elif self.forward_speed >= 0.7:
+        kp = 0.035
+
 
     omega = (self.forward_speed * kp) * error
+    print("omega:", omega, "error:", error, "kp * forward_speed:", (self.forward_speed * kp))
+
     return omega
     
   # Lane switcher function
@@ -205,6 +228,7 @@ class LaneFollower(object):
 
           elif self.right_angle == 0.0:
                 self.switch_right = False
+          
           
 
 
@@ -232,78 +256,112 @@ class LaneFollower(object):
     ## Filter the lines to determine which lane they belong to
     far_left, left, right, far_right = self.get_lines(filtered_hsv_image)
 
+
     ## Make a copy of the warped image to draw the lines on
     warped_image_copy = warped_image.copy()
-
-
-    ## Get a stripe of single straight line
-    self.draw_line(warped_image_copy, self.get_straight_Line(left))
-    self.draw_line(warped_image_copy, self.get_straight_Line(right))
-    self.draw_line(warped_image_copy, self.get_straight_Line(far_left))
-    self.draw_line(warped_image_copy, self.get_straight_Line(far_right))
-
+          
+          
+    # draw the lines on the warped image copy
+    if far_left.any():
+          for line in far_left:
+                self.draw_line(warped_image_copy, line)
+    if left.any():
+          for line in left:
+                self.draw_line(warped_image_copy, line)
+    if right.any():
+          for line in right:
+                self.draw_line(warped_image_copy, line)
+    if far_right.any():
+          for line in far_right:
+                self.draw_line(warped_image_copy, line)
+ 
+    
     ## showing the warped image
-    self.show_image("filtered_hsv_image", warped_image_copy)
+    self.show_image("warped_image_copy", warped_image_copy)
 
-    ## Determine the angles of each line
+    # Determine the angles of each line
     self.get_angles(far_left, left, right, far_right)
     
+    # # print("left line", left)
+    # if self.left_angle != 0.0:
+    #     print("left angle: ", self.left_angle)
+    #     print("left line: ", left)
+    # if self.right_angle != 0.0:
+    #     print("right angle: ", self.right_angle)
+    #     print("right line: ", right)
+    # if self.far_left_angle != 0.0:
+    #     print("far left angle: ", self.far_left_angle)
+    #     print("far left line: ", far_left)
+    # if self.far_right_angle != 0.0:
+    #     print("far right angle: ", self.far_right_angle)
+    #     print("far right line: ", far_right)
 
+    print("---------------------------------")
     ## Determine the mean x value for the left, right, far_left and far_right line 
-    mean_left, mean_right, mean_far_left, mean_far_right = None, None, None, None
+    # mean_left, mean_right, mean_far_left, mean_far_right = None, None, None, None
+    # if left.any():
+    #     mean_left = int(np.mean((self.get_straight_Line(left))[[0, 2]]))
+    #     print("mean_left: ", mean_left)
+    # else:
+    #     mean_left = None
+    # if right.any():
+    #     mean_right = int(np.mean((self.get_straight_Line(right))[[0, 2]]))
+    #     print("mean_right: ", mean_right)
+    # else:
+    #     mean_right = None
+    # if far_left.any():
+    #     mean_far_left = int(np.mean((self.get_straight_Line(far_left))[[0, 2]]))
+    #     print("mean_far_left: ", mean_far_left)
+    # else:
+    #     mean_far_left = None
+    # if far_right.any():
+    #     mean_far_right = int(np.mean((self.get_straight_Line(far_right))[[0, 2]]))
+    #     print("mean_far_right: ", mean_far_right)
+    # else:
+    #     mean_far_right = None
+    # print("---------------------------------")
+        # creating omega and the switch lane part
     if left.any():
-        mean_left = int(np.mean((self.get_straight_Line(left))[[0, 2]]))
-    else:
-        mean_left = None
+        left_av_x = np.mean((left[:, 0] + left[:, 2]) / 2)
+
     if right.any():
-        mean_right = int(np.mean((self.get_straight_Line(right))[[0, 2]]))
-    else:
-        mean_right = None
-    if far_left.any():
-        mean_far_left = int(np.mean((self.get_straight_Line(far_left))[[0, 2]]))
-    else:
-        mean_far_left = None
-    if far_right.any():
-        mean_far_right = int(np.mean((self.get_straight_Line(far_right))[[0, 2]]))
-    else:
-        mean_far_right = None
+        right_av_x = np.mean((right[:, 0] + right[:, 2]) / 2)
 
-    omega = 0.0
-    ## calculate the omega
-    if mean_left != None and mean_right != None:
-        omega = self.calculate_omega(mean_left, mean_right, middle)
+    # calculating omega
+    omega = self.calculate_omega(left_av_x, right_av_x, middle)
+
+
+    # # omega = 0.0
+    # ## calculate the omega
+    # if mean_left != None and mean_right != None:
+    #       omega = self.calculate_omega(mean_left, mean_right, middle)
     
-    elif mean_left == None and mean_right != None:
-        omega = self.calculate_omega(0, mean_right, middle)   
+    # elif mean_left == None and mean_right != None:
+    #       omega = self.calculate_omega(0, mean_right, middle)   
           
-    elif mean_left != None and mean_right == None:
-        omega = self.calculate_omega(mean_left, 0, middle)
-
-    ## Lane switching
-    if self.switch_left == True:
-      if mean_far_left != None:
-          if(self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_right_angle == 0.0):
-              omega = self.lane_switcher(mean_left, mean_far_left, middle)
-      else:
-          if mean_far_right != None:
-            self.switch_left = False
-            self.far_right_angle = 0.0
+    # elif mean_left != None and mean_right == None:
+    #     omega = self.calculate_omega(mean_left, 0, middle)
 
 
-    if self.switch_right == True:
-      if mean_far_right != None:
-          if(self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_left_angle == 0.0):
-              omega = self.lane_switcher(mean_right, mean_far_right, middle)
-      else:
-          if mean_far_left != None:
-            self.switch_right = False
-            self.far_left_angle = 0.0
+    # ## Lane switching
+    # if self.switch_left == True:
+    #   if mean_far_left != None:
+    #       if(self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_right_angle == 0.0):
+    #           omega = self.lane_switcher(mean_left, mean_far_left, middle)
+    #   else:
+    #       if mean_far_right != None:
+    #         self.switch_left = False
+    #         self.far_right_angle = 0.0
 
-    if omega == None:
-          omega = 0.0
 
-    if omega == -0.0:
-          omega = 0.0
+    # if self.switch_right == True:
+    #   if mean_far_right != None:
+    #       if(self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_left_angle == 0.0):
+    #           omega = self.lane_switcher(mean_right, mean_far_right, middle)
+    #   else:
+    #       if mean_far_left != None:
+    #         self.switch_right = False
+    #         self.far_left_angle = 0.0
 
     # Send velocity
     self.send_velocity(omega)
