@@ -8,3 +8,5 @@ class ObjectTracker(object):
     self.lane_occupied["left_lane"] = False
     self.lane_occupied["right_lane"] = False
     self.lane_occupied["front"] = False
+
+    
