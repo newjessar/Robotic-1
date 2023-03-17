@@ -18,5 +18,10 @@ def run_launch_file(bot_name, position):
 
 ## Add bot to spawn here via run_launch_file (bot_name, position)
 run_launch_file("bot1", 0)
+# run_launch_file("bot2", 8)
+# run_launch_file("bot3", 10)
+# run_launch_file("bot4", 12)
+# run_launch_file("bot5", 3)
+# run_launch_file("bot6", 2)
 
 rospy.spin()

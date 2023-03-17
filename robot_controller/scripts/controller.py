@@ -10,7 +10,7 @@ from bot_message.srv import SetSpeed, SetSpeedResponse
 class Controller(object):
 
   def __init__(self):
-    self.forward_speed = 0.7 # Set the starting forward speed, DO NOT CHANGE
+    self.forward_speed = 0.0 # Set the starting forward speed, DO NOT CHANGE
     self.lane_follower = LaneFollower(self.forward_speed)
     self.object_tracker = ObjectTracker()
     self.laser_data = LaserData(self.laser_callback)
@@ -63,7 +63,13 @@ class Controller(object):
 
   # Laser callback function, gets called at 10Hz
   def laser_callback(self, laser_msg):
-    pass
+        
+    data = self.laser_data.convert_to_cartesian(laser_msg)
+    if data:
+        cluster = self.laser_data.cluster(data)
+        side = self.object_tracker.tracking_objects(cluster)  
+        print(side)
+    # print(data)
    
 if __name__ == "__main__":
   rospy.init_node("controller")

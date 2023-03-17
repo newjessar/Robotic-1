@@ -63,6 +63,5 @@ class SignRecognizer:
     def save_data(self):
         data = np.asarray(self.collectedROIs)
         np.save(os.path.join(self.path, "{0}.npy".format(self.data_filename)), data)
-        print "Saved data"
-
+        print ("Saved data")
 

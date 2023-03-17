@@ -117,7 +117,7 @@ class SignManager(object):
     try:
       sign = self.signs[str(req.position)]
     except KeyError:
-      print "Position is not a valid position"
+      print("Position is not a valid position")
       return DeleteSignResponse()
 
     self.delete_model_service(sign.name + "_{0}".format(req.position))
@@ -133,7 +133,7 @@ class SignManager(object):
     try:
       sign = self.signs[str(position)]
     except KeyError: 
-      print "Position {0} is not a valid position".format(position)
+      print ("Position {0} is not a valid position".format(position))
       return AddSignResponse()
     
     if sign.name == "":
@@ -177,7 +177,7 @@ class SignManager(object):
       sign_xml = self.smiley
     
     else:
-      print "Sign name not valid"
+      print ("Sign name not valid")
       return 
 
     self.spawn_model_service(sign.name + "_{0}".format(position), sign_xml, "", pose, "world")
