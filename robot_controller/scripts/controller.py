@@ -61,6 +61,7 @@ class Controller(object):
 
     return EmptyResponse()
 
+
   # Laser callback function, gets called at 10Hz
   def laser_callback(self, laser_msg):
         
