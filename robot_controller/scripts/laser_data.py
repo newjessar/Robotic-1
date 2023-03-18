@@ -1,8 +1,10 @@
 from sensor_msgs.msg import LaserScan
 import rospy
 import numpy as np
+import cv2
 import math
 from math import cos, sin, sqrt
+
 
 
 class LaserData(object):
@@ -31,15 +33,16 @@ class LaserData(object):
       dist = np.linalg.norm(point1 - point2)
       return dist
 
-  # Find the closest point to the robot
+  # Cluster data cartesian data so that the robot can detect the closest object beside him
+  # So we determain of a pointis belong  to the same cluster or not, using a predefines threshold
   def cluster(self, data):
       data = np.array(data)
       threshold = 0.3
       min_points = 10
-      
+
       clusters = []
       current_cluster = [data[0]]
-      
+
       for point in data[1:]:
           if self.distance(current_cluster[-1], point) < threshold:
               current_cluster.append(point)
@@ -47,15 +50,24 @@ class LaserData(object):
               if len(current_cluster) > min_points:
                   clusters.append(current_cluster)
               current_cluster = [point]
-      
+
       if len(current_cluster) > min_points:
           clusters.append(current_cluster)
-      
+
+      # Check if the first and last clusters should be merged
+      if len(clusters) > 1:
+          first_cluster = clusters[0]
+          last_cluster = clusters[-1]
+
+          if self.distance(first_cluster[0], last_cluster[-1]) < threshold:
+              merged_cluster = np.concatenate((first_cluster, last_cluster))
+              clusters[0] = merged_cluster
+              clusters.pop(-1)
+
       means = [np.mean(cluster, axis=0) for cluster in clusters]
-      
+
       return means
-    # Cluster the data
-    # Return the clusters
+
 
 
   def plot_clusters(self, clusters):
@@ -67,7 +79,7 @@ class LaserData(object):
     for clusterIdx in range(len(clusters)):
       color = self.color_order[clusterIdx % 5]
       for point in clusters[clusterIdx]:
-        cv2.circle(canvas, (int(100*point[0] + x_center), int(100*point[1] + y_center)), 1, color, -1)
+        cv2.circle(canvas, (int(100*point[0] + x_center), int(100*point[1] + y_center)), 6, color, -1)
     
     cv2.arrowedLine(canvas,(0,300),(599,300),(0, 0, 0), tipLength = 0.02) # x-axis
     cv2.arrowedLine(canvas,(300,0),(300,599),(0, 0, 0), tipLength = 0.02) # y-axis
@@ -90,3 +102,6 @@ class LaserData(object):
       rospy.signal_shutdown("exit")
     if key == ord('s'): # Pressing 's' will save the image
       cv2.imwrite("lidar_image.png", canvas)
+
+
+

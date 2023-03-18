@@ -7,7 +7,7 @@ rosrun sign_manager sign_manager_node.py
 rosrun sign_manager add_signs.py
 rosrun bot_spawner bot_spawner.py
 
-roslaunch bot_controller add_bot.launch botname:=bot1 position:=0
+roslaunch bot_controller add_bot.launch botname:=bot2 position:=0
 rosservice call /bot1/set_speed "speed: 0.3"
 
 rosrun keyboard_teleop keyboard_teleop_node
@@ -16,6 +16,7 @@ rosservice call /switch_left
 rosservice call /switch_right
 
 # Running the lidar pipeline (plot the lidar clusters) without the controller:
+cd catkin_ws/src/students22
 python robot_controller/scripts/test_laser.py
 
 
