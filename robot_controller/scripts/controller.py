@@ -68,7 +68,7 @@ class Controller(object):
     data = self.laser_data.convert_to_cartesian(laser_msg)
     if data:
         cluster = self.laser_data.cluster(data)
-        self.object_tracker.tracking_objects(cluster)  
+        self.object_tracker.check_lanes(cluster)  
         print(self.object_tracker.lane_occupied)
     # print(data)
    

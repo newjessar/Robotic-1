@@ -5,6 +5,7 @@ class ObjectTracker(object):
 
     def __init__(self):
         self.lane_width = 0.5 # The width of a lane (from line to line) in meters
+        self.lane_segment = self.lane_width/2
         self.lane_occupied = {}
         self.lane_occupied["left_lane"] = False
         self.lane_occupied["right_lane"] = False
@@ -12,7 +13,7 @@ class ObjectTracker(object):
 
     # tracking objects, take the cluster means as input and return the lane occupied
     # the function will remove doplicate objects 
-    def tracking_objects(self, means):
+    def check_lanes(self, means):
         # Reset lane_occupied values
         self.lane_occupied["left_lane"] = False
         self.lane_occupied["right_lane"] = False
@@ -32,12 +33,12 @@ class ObjectTracker(object):
                         self.lane_occupied["back"] = True
 
                 # object on the left and right
-                if 0.25 <= y <= 0.75:
+                if self.lane_segment <= y <= (self.lane_segment+self.lane_width):
                     # object on the left
                     if not (0.30 >= y >= 0.38):
                         self.lane_occupied["left_lane"] = True
                 # object on the right
-                if -0.75 <= y <= -0.25:
+                if -(self.lane_segment+self.lane_width) <= y <= -(self.lane_segment):
                     if not (-0.37 <= y <= -0.30):
                         self.lane_occupied["right_lane"] = True
 
