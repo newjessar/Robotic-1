@@ -68,8 +68,8 @@ class Controller(object):
     data = self.laser_data.convert_to_cartesian(laser_msg)
     if data:
         cluster = self.laser_data.cluster(data)
-        side = self.object_tracker.tracking_objects(cluster)  
-        print(side)
+        self.object_tracker.tracking_objects(cluster)  
+        print(self.object_tracker.lane_occupied)
     # print(data)
    
 if __name__ == "__main__":
