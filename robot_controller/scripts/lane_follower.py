@@ -34,10 +34,15 @@ class LaneFollower(object):
     self.far_right_angle = 0
 
     ## Lane swtiching Untility
-
     self.straight_line_count = 0
     self.switch_left = False
     self.switch_right = False
+    self.old_omega = 0.0
+    self.left_onhold = False
+    self.right_onhold = False
+    self.left_lane_exist = False
+    self.right_lane_exist = False
+    self.straight_path = False
 
     self.image_subscriber = rospy.Subscriber(image_topic, Image, self.image_callback, queue_size=1)
 
@@ -206,7 +211,7 @@ class LaneFollower(object):
 
     if self.forward_speed == 1.2:
       if error > 100 or error < -100:
-          kp = 0.009
+          kp = 0.007
       else:
           kp = 0.01
     elif self.forward_speed >= 0.7:
@@ -222,26 +227,19 @@ class LaneFollower(object):
     
   # Lane switcher function
   def lane_switcher(self, mean, mean_far, width):
-    
-    if self.switch_left:
-        if self.left_angle == 0.0 and self.far_left_angle == 0.0:
-          if mean_far != None and mean != None:
-            omega = self.calculate_omega(mean_far, mean, width)
-            return omega
-          
-          elif self.left_angle == 0.0:
-                self.switch_left = False
-    
-    if self.switch_right:
-        if self.right_angle == 0.0 and self.far_right_angle == 0.0:
-          if mean_far != None and mean != None:
-            omega = self.calculate_omega(mean, mean_far, width)
-            return omega
+    # check to assure omega will not be altered during the turn
+    if self.left_angle == 0.0 and self.far_left_angle == 0.0:
+      # A check related to extended switching time in case no straight line is detected
+      if self.left_onhold == False and mean_far != None and mean != None:
+        omega = self.calculate_omega(mean_far, mean, width)
+        return omega
+      
+    # if self.switch_right:
+    if self.right_angle == 0.0 and self.far_right_angle == 0.0:
+      if self.right_onhold == False and mean_far != None and mean != None:
+        omega = self.calculate_omega(mean, mean_far, width)
+        return omega
 
-          elif self.right_angle == 0.0:
-                self.switch_right = False
-          
-          
 
 
   # Image callback function, gets called at 10Hz 
@@ -273,14 +271,14 @@ class LaneFollower(object):
           
     # draw the lines on the warped image copy
     # Concatenate all non-empty line arrays
-    non_empty_lines = [arr for arr in [far_left, left, right, far_right] if arr.any()]
-    concatenated_lines = np.concatenate(non_empty_lines) if non_empty_lines else np.array([])
+    # non_empty_lines = [arr for arr in [far_left, left, right, far_right] if arr.any()]
+    # concatenated_lines = np.concatenate(non_empty_lines) if non_empty_lines else np.array([])
 
     # Iterate through the concatenated array and draw lines
-    for line in concatenated_lines: self.draw_line(warped_image_copy, line)
+    # for line in concatenated_lines: self.draw_line(warped_image_copy, line)
 
     ## showing the warped image
-    self.show_image("warped_image_copy", warped_image_copy)
+    # self.show_image("warped_image_copy", warped_image_copy)
 
     # Determine the angles of each line
     self.get_angles(far_left, left, right, far_right)
@@ -296,32 +294,52 @@ class LaneFollower(object):
     if far_right.any():
         mean_far_right = np.mean((far_right[:, 0] + far_right[:, 2]) / 2)
     
+    omega = 0.0
     # calculating omega
-    omega = self.calculate_omega(mean_left, mean_right, middle)
+    if mean_left != None and mean_right != None:
+        omega = self.calculate_omega(mean_left, mean_right, middle)
 
+    # check if a straight path is detected
+    self.straight_path = True if self.straight_line_count >= 10 else False
+    # check if left lane exist
+    self.left_lane_exist = True if mean_far_left is not None else False
+    # check if right lane exist
+    self.right_lane_exist = True if mean_far_right is not None else False
 
-    ## Lane switching, with restrains in case there is a conming turn buy
-    ## you already have a turn message, then the turn will wait until the
-    ## the lines are straight again
-    if self.switch_left == True:
-      if mean_far_left != None:
-          if(self.straight_line_count >= 10):
-              omega = self.lane_switcher(mean_left, mean_far_left, middle)
-      else:
-          if mean_far_right != None:
-            self.switch_left = False
-            self.far_right_angle = 0.0
-
-
-    if self.switch_right == True:
-      if mean_far_right != None:
-          if(self.straight_line_count >= 10):
-              omega = self.lane_switcher(mean_right, mean_far_right, middle)
-      else:
+    ## Lane switching, with restrains in case there is a coming turn approaching
+    ## if you already have a turn message, then the turn will wait until the
+    ## the lines are straight again or there is lane in genral
+    if self.left_onhold == False:
+      if self.switch_left == True:
           if mean_far_left != None:
-            self.switch_right = False
-            self.far_left_angle = 0.0
+              if self.straight_path:
+                  omega = self.lane_switcher(mean_left, mean_far_left, middle)
 
+          else:
+                # edge case, the corners create a far right, holding the turn is required
+              if mean_far_right != None and self.left_onhold == False:
+                  self.switch_left = False
+                  self.far_right_angle = 0.0
+                  self.left_onhold = False
+
+    if self.right_onhold == False:
+      if self.switch_right == True:
+          if mean_far_right != None:
+              if self.straight_path:
+                  omega = self.lane_switcher(mean_right, mean_far_right, middle)
+
+          else:
+              if mean_far_left != None and self.right_onhold == False:
+                  self.switch_right = False
+                  self.far_left_angle = 0.0
+                  self.right_onhold = False
+
+
+    if omega:
+          self.old_omega = omega
+    else:
+          omega = self.old_omega
+          
     # Send velocity
     self.send_velocity(omega)
 

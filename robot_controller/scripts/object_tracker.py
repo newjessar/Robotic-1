@@ -18,20 +18,17 @@ class ObjectTracker(object):
         self.lane_occupied["left_lane"] = False
         self.lane_occupied["right_lane"] = False
         self.lane_occupied["front"] = False
-        self.lane_occupied["back"] = False
+        # self.lane_occupied["back"] = False
 
         if means:
             for item in means:
                 x, y = item
                 # object on the front or back
                 if -0.1 <= y <= 0.1:
-                    # object on front within 2.5 meters
-                    if 0 <= x <= 2.5:
+                    # object on front within 2.0 meters
+                    if 0 <= x <= 2.0:
                         self.lane_occupied["front"] = True
-                    # object on back within 2.5 meters
-                    if -2.5 <= x <= 0:
-                        self.lane_occupied["back"] = True
-
+         
                 # object on the left and right
                 if self.lane_segment <= y <= (self.lane_segment+self.lane_width):
                     # object on the left
