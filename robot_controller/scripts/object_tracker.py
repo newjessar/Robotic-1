@@ -13,15 +13,15 @@ class ObjectTracker(object):
 
     # tracking objects, take the cluster means as input and return the lane occupied
     # the function will remove doplicate objects 
-    def check_lanes(self, means):
+    def check_lanes(self, clusters):
         # Reset lane_occupied values
         self.lane_occupied["left_lane"] = False
         self.lane_occupied["right_lane"] = False
         self.lane_occupied["front"] = False
 
 
-        if means:
-            for item in means:
+        if clusters:
+            for item in clusters:
                 x, y = item
                 # object on the front or back
                 if -0.1 <= y <= 0.1:

@@ -110,6 +110,7 @@ class Controller(object):
               self.lane_follower.forward_speed = self.old_speed
               self.old_speed = 0.0         
 
+    print(self.object_tracker.lane_occupied)
 
    
 if __name__ == "__main__":
