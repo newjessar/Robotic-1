@@ -54,7 +54,7 @@ class LaserData(object):
       if len(current_cluster) > min_points:
           clusters.append(current_cluster)
 
-      # Check if the first and last clusters should be merged
+      # Last check to assure the first and last clusters are not too far apart
       if len(clusters) > 1:
           first_cluster = clusters[0]
           last_cluster = clusters[-1]
