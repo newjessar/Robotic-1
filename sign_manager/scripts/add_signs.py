@@ -17,47 +17,36 @@ def add_sign(sign_name, position):
 # Available sign names 
 sign_names = ["right_arrow", "left_arrow", "up_arrow", "triangle", "square", "smiley"] 
 
+#     0    <     go to left lane                4
+#     1    >     go to right lane               3
+#     2    ^     both lanes are allowed         4
+#     3    #     slow down = 0.7 m/s            3
+#     4    $     speed up = 1.2 m/s             5
+#     5    ~    Smile, you are on camera        2
+
 # Add the sign "up arrow" and location 0
-add_sign(sign_names[2], 0)
-add_sign(sign_names[0], 1)
-# add_sign(sign_names[2], 2)
-add_sign(sign_names[3], 3)
-add_sign(sign_names[0], 4)
-# add_sign(sign_names[2], 5)
-add_sign(sign_names[3], 6)
-# add_sign(sign_names[2], 7)
-# add_sign(sign_names[2], 8)
-add_sign(sign_names[2], 9)
-# add_sign(sign_names[2], 10)
-add_sign(sign_names[3], 11)
-# add_sign(sign_names[2], 12)
-add_sign(sign_names[4], 13)
-add_sign(sign_names[0], 15)
-# add_sign(sign_names[2], 16)
-add_sign(sign_names[1], 17)
-# add_sign(sign_names[2], 18)
-add_sign(sign_names[4], 19)
-# add_sign(sign_names[2], 20)
-add_sign(sign_names[2], 20)
-# add_sign(sign_names[2], 22)
-add_sign(sign_names[4], 23)
-# add_sign(sign_names[2], 24)
-add_sign(sign_names[0], 24)
-# add_sign(sign_names[2], 26)
-add_sign(sign_names[1], 27)
-# add_sign(sign_names[2], 28)
-add_sign(sign_names[2], 29)
-# add_sign(sign_names[2], 30)
-add_sign(sign_names[3], 30)
-# add_sign(sign_names[2], 32)
-add_sign(sign_names[4], 33)
-add_sign(sign_names[1], 34)
-# add_sign(sign_names[1], 35)
-# add_sign(sign_names[2], 36)
-# add_sign(sign_names[2], 37)
-# add_sign(sign_names[3], 38)
-# add_sign(sign_names[2], 39)
-# add_sign(sign_names[4], 40)
-# add_sign(sign_names[2], 41)
+add_sign(sign_names[2], 0)            # ^
+add_sign(sign_names[5], 3)            # ~
+add_sign(sign_names[4], 17)           # $
+add_sign(sign_names[1], 19)           # >
+add_sign(sign_names[0], 20)           # <
+add_sign(sign_names[4], 23)           # #
+add_sign(sign_names[0], 24)           # <
+add_sign(sign_names[3], 27)           # #
+add_sign(sign_names[2], 28)           # ^
+add_sign(sign_names[4], 30)           # $
+add_sign(sign_names[1], 33)           # >
+add_sign(sign_names[3], 34)           # #
+add_sign(sign_names[0], 37)           # < 
+add_sign(sign_names[4], 38)           # $
+add_sign(sign_names[5], 41)           # ~
+add_sign(sign_names[2], 9)            # ^ 
+add_sign(sign_names[1], 11)           # > 
+add_sign(sign_names[3], 12)           # #
+add_sign(sign_names[2], 15)           # ^
+add_sign(sign_names[4], 4)            # $
+add_sign(sign_names[0], 6)            # < 
+
+
 
 
