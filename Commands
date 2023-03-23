@@ -7,8 +7,8 @@ rosrun sign_manager sign_manager_node.py
 rosrun sign_manager add_signs.py
 rosrun bot_spawner bot_spawner.py
 
-roslaunch bot_controller add_bot.launch botname:=bot2 position:=0
-rosservice call /bot1/set_speed "speed: 0.3"
+roslaunch bot_controller add_bot.launch botname:=bot1 position:=0
+rosservice call /bot1/set_speed "speed: 0.0"
 
 rosrun keyboard_teleop keyboard_teleop_node
 rosservice call /set_speed "speed: 1.2"

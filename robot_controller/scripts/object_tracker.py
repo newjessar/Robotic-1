@@ -19,7 +19,8 @@ class ObjectTracker(object):
         self.lane_occupied["right_lane"] = False
         self.lane_occupied["front"] = False
 
-
+        ### !!There is some noise leading to declare an object  detection related to the signs!!
+        ### !!to avoide this matter I excluded the size of the signs from each side!!
         if clusters:
             for item in clusters:
                 x, y = item
@@ -34,6 +35,7 @@ class ObjectTracker(object):
                     # object on the left
                     if not (0.30 >= y >= 0.38):
                         self.lane_occupied["left_lane"] = True
+
                 # object on the right
                 if -(self.lane_segment+self.lane_width) <= y <= -(self.lane_segment):
                     if not (-0.37 <= y <= -0.30):

@@ -16,7 +16,7 @@ def callback_function(laser_msg):
     clusters = [means]  # Wrap the means in a list
     # print("Clusters:", clusters)  # Add this line
     clusterss = [cartesian_data]
-    laser_data.plot_clusters(clusterss)  
+    laser_data.plot_clusters(clusters)  
     # print(clusters)
 
 
