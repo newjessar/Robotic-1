@@ -64,9 +64,10 @@ class LaserData(object):
               clusters[0] = merged_cluster
               clusters.pop(-1)
 
-      means = [np.mean(cluster, axis=0) for cluster in clusters]
+      # Calculate the mean of each cluster then return the their list
+      clusters_means = [np.mean(cluster, axis=0) for cluster in clusters]
 
-      return means
+      return clusters_means
 
 
 

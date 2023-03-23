@@ -51,7 +51,6 @@ class Controller(object):
   def initiate_switch_left(self, empty_msg):
     # Check line angles to see if you can switch lanes
     # Start the lane switching
-
     self.lane_follower.switch_left = True
 
     return EmptyResponse()
@@ -60,7 +59,6 @@ class Controller(object):
   def initiate_switch_right(self, empty_msg):
     # Check line angles to see if you can switch lanes
     # Start the lane switching
-
     self.lane_follower.switch_right = True
 
     return EmptyResponse()
@@ -68,8 +66,7 @@ class Controller(object):
 
   # Laser callback function, gets called at 10Hz
   def laser_callback(self, laser_msg):
-
-
+    # Get the laser data in cartesian coordinates
     data = self.laser_data.convert_to_cartesian(laser_msg)
 
     
@@ -113,7 +110,6 @@ class Controller(object):
               self.lane_follower.forward_speed = self.old_speed
               self.old_speed = 0.0         
 
-    # print(self.object_tracker.lane_occupied)
 
    
 if __name__ == "__main__":

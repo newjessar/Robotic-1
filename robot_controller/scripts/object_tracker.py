@@ -21,10 +21,11 @@ class ObjectTracker(object):
 
         ### !!There is some noise leading to declare an object  detection related to the signs!!
         ### !!to avoide this matter I excluded the size of the signs from each side!!
+        ### This issue can appear especially when the vehicle is taken a turn
         if clusters:
             for item in clusters:
                 x, y = item
-                # object on the front or back
+                # object on front
                 if -0.1 <= y <= 0.1:
                     # object on front within 2.0 meters
                     if 0 <= x <= 2.0:

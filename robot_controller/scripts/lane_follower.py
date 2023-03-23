@@ -86,12 +86,15 @@ class LaneFollower(object):
 
     # Assuming 'image' is your grayscale input image
     lsd = cv2.createLineSegmentDetector(0)
-    flo_lines, width, prec, nfa = lsd.detect(binary_mask)
+    detected_lines, width, prec, nfa = lsd.detect(binary_mask)
 
-    # Round the coordinates to the nearest integer and convert them to integers
-    lines = np.round(flo_lines).astype(np.int32)
+    # Round the coordinates to the nearest integer and convert them to int 
+    lines = np.round(detected_lines).astype(np.int32)
 
+    ## Remove the extra dimension from the lines array
     lines = np.squeeze(lines)
+
+    ## Itteration over the lines to get the far_left, left, right, far_right lines
     if lines.any():
         # Calculate the average x values for each line
         x_axis = np.mean(lines[:, [0, 2]], axis=1)
@@ -229,7 +232,7 @@ class LaneFollower(object):
   def lane_switcher(self, mean, mean_far, width):
     # check to assure omega will not be altered during the turn
     if self.left_angle == 0.0 and self.far_left_angle == 0.0:
-      # A check related to extended switching time in case no straight line is detected
+      # Check related to extended switching time in case no straight line is detected
       if self.left_onhold == False and mean_far != None and mean != None:
         omega = self.calculate_omega(mean_far, mean, width)
         return omega
@@ -266,11 +269,13 @@ class LaneFollower(object):
     ## Filter the lines to determine which lane they belong to
     far_left, left, right, far_right = self.get_lines(filtered_hsv_image)
 
+    ############################################################################################################
+    ######################## Section is related to drawing the lines and the image #############################
+    ############################################################################################################
     ## Make a copy of the warped image to draw the lines on
     warped_image_copy = warped_image.copy()
           
     # draw the lines on the warped image copy
-    # Concatenate all non-empty line arrays
     # non_empty_lines = [arr for arr in [far_left, left, right, far_right] if arr.any()]
     # concatenated_lines = np.concatenate(non_empty_lines) if non_empty_lines else np.array([])
 
@@ -279,7 +284,7 @@ class LaneFollower(object):
 
     ## showing the warped image
     # self.show_image("warped_image_copy", warped_image_copy)
-
+    ############################################################################################################
     # Determine the angles of each line
     self.get_angles(far_left, left, right, far_right)
 
