@@ -18,5 +18,7 @@ rosservice call /switch_right
 # Running the lidar pipeline (plot the lidar clusters) without the controller:
 cd catkin_ws/src/students22
 python robot_controller/scripts/test_laser.py
+# to check the frequency of the lidar data`
+rostopic hz /scan
 
 
