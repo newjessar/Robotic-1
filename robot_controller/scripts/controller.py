@@ -2,7 +2,7 @@
 import rospy 
 from lane_follower import LaneFollower
 from laser_data import LaserData
-# from sign_recognizer import SignRecognizer
+from sign_recognizer import SignRecognizer
 from object_tracker import ObjectTracker
 from std_srvs.srv import Empty, EmptyResponse
 from bot_message.srv import SetSpeed, SetSpeedResponse
@@ -10,10 +10,11 @@ from bot_message.srv import SetSpeed, SetSpeedResponse
 class Controller(object):
 
   def __init__(self):
-    self.forward_speed = 0.7 # Set the starting forward speed, DO NOT CHANGE
+    self.forward_speed = 0.0 # Set the starting forward speed, DO NOT CHANGE
     self.lane_follower = LaneFollower(self.forward_speed)
     self.object_tracker = ObjectTracker()
     self.laser_data = LaserData(self.laser_callback)
+    self.sign_recognizer = SignRecognizer(data_collection_mode = False, data_filename="training")
 
     # temprery speed for the lane follower
     self.old_speed = 0.0
@@ -108,7 +109,15 @@ class Controller(object):
            if self.lane_follower.switch_left == False and self.lane_follower.switch_right == False and self.old_speed != 0.0:
 
               self.lane_follower.forward_speed = self.old_speed
-              self.old_speed = 0.0         
+              self.old_speed = 0.0   
+
+    self.signs_detection_callback()      
+
+  # call the sign recognizer callback function
+  def signs_detection_callback(self):
+    # call the sign recognizer callback function and semd the orignal image
+    self.sign_recognizer.classify(self.lane_follower.original_image)
+
 
 
    

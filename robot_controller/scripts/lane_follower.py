@@ -194,7 +194,7 @@ class LaneFollower(object):
       x1, y1, x2, y2 = line
       cv2.line(image, (x1, y1), (x2, y2), (255, 0, 0), 2)
         
-
+  # Show the image
   def show_image(self, name, image):
     cv2.imshow(name, image)
     key = cv2.waitKey(1) & 0xFF
