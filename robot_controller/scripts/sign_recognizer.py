@@ -109,12 +109,10 @@ class SignRecognizer:
         # Convert and filter HSV 
         hsv_image = self.to_hsv(image)
         mask = self.filter_hsv(hsv_image)
-        # kernel = np.ones((5,5),np.uint8)
-        # mask = cv2.dilate(mask,kernel,iterations = 0) # set the number of iterations (use the calibrator to find a good parameter)
-        # mask = cv2.erode(mask, kernel, iterations = 0) # set the number of iterations (use the calibrator to find a good parameter)
-        
+        # Post process the image
+        prossed_mask = self.post_process(mask)
         # showing the warped image
-        self.show_image("warped_image_copy", mask)
+        self.show_image("warped_image_copy", prossed_mask)
 
         # Use the mask to find the contours (which should be rectangles indicating a sign)
         # For each contour extract the rectangle (ROI, Region of Interest)
