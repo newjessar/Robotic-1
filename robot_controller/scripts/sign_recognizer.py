@@ -31,7 +31,7 @@ class SignRecognizer:
     
     ## Show the image
     def show_image(self, name, image):
-        print("Showing image")
+
         cv2.imshow(name, image)
         key = cv2.waitKey(1) & 0xFF
 
@@ -99,7 +99,7 @@ class SignRecognizer:
         masked_image = cv2.bitwise_and(image, image, mask = mask)
 
 
-        return mask
+        return masked_image
       
          
     def classify(self, image):
