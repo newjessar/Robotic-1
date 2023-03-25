@@ -1,5 +1,5 @@
 import rospy
-import cv2
+import cv2 as cv2
 import numpy as np
 import tensorflow as tf
 import sys
@@ -9,36 +9,25 @@ import os
 class SignRecognizer:
     
     def __init__(self, data_collection_mode = False, data_filename = None):
+
         self.labels = ["left", "right", "up", "square", "triangle", "smiley", "background"]
         # Data should be stored in /home/username/data/
         self.path = os.path.join(os.environ["HOME"], "data")
-        self.ROI = None
+        self.ROI = []
         self.roi_classification_size = 28
         self.collectedROIs = []
 
         self.collect = data_collection_mode
         self.data_filename = data_filename
         
-        # if data_collection_mode: # If collecting data, run save function on shutdown
-        #     rospy.on_shutdown(self.save_data)
-        # else: # Else load the network and run the predict function once
-        #     self.model = tf.keras.models.load_model(os.path.join(os.environ["HOME"] + "/network_model", "model_classifier.h5"))
-        #     # Run the network once since first time it is slow
-        #     fake_image = np.zeros((self.roi_classification_size, self.roi_classification_size, 3))
-        #     self.model.predict(np.asarray([fake_image]))
+        if self.collect: # If collecting data, run save function on shutdown
+            rospy.on_shutdown(self.save_data)
+        else: # Else load the network and run the predict function once
+            self.model = tf.keras.models.load_model(os.path.join(os.environ["HOME"] + "/network_model", "model_classifier.h5"))
+            # Run the network once since first time it is slow
+            fake_image = np.zeros((self.roi_classification_size, self.roi_classification_size, 3))
+            self.model.predict(np.asarray([fake_image]))
 
-
-    
-    ## Show the image
-    def show_image(self, name, image):
-
-        cv2.imshow(name, image)
-        key = cv2.waitKey(1) & 0xFF
-
-        if key == ord('q'): # Pressing 'q' will shutdown the program
-            rospy.signal_shutdown("exit")
-        if key == ord('s'): # Pressing 's' will save the image
-            cv2.imwrite("lane_follower_image.png", image)
 
     def to_hsv(self, image):
         # Convert to HSV 
@@ -79,7 +68,7 @@ class SignRecognizer:
     def get_rois(self, processed_mask, image):
         out_ROIs = []
         contours = self.find_contours(processed_mask)
-
+        
         for contour in contours:
             # Get the bounding rectangle of the contour
             x, y, w, h = cv2.boundingRect(contour)
@@ -100,52 +89,68 @@ class SignRecognizer:
             cv2.imshow("ROI", out_ROIs[max_index])
             cv2.waitKey(1)
 
-            print("out_ROIs", out_ROIs[max_index])
-            return out_ROIs[max_index]
-        
-        return None
+            # print("out_ROIs", out_ROIs[max_index])
+            return np.asarray(out_ROIs[max_index])
+        return np.asarray(out_ROIs)
+
+    
+    # Predict the ROI image and return the label
+    def predict(self, roi):
+    # Run the self.model.predict function with the input of the ROI image, remember that the input should be normalized
+    # Return the label of the ROI image 
+        flouting_ROI = np.asarray(roi).astype(np.float32)
+        normalize_ROI = np.true_divide(flouting_ROI, 255)
+        label_images = self.model.predict(normalize_ROI)
+    
+        return label_images
 
 
     # Classify and save the data to a file
     def classify(self, image):
 
+        label_images = 0
+        label_idx = -1
 
         # If self.collect == False
         #     Return either 1 ROI, or return the label of that ROI 
-        if self.collect == False:
 
-            self.labels = ["left", "right", "up", "square", "triangle", "smiley", "background"]
-            
-            label_images = 0
-            label_idx = -1
+    
+        self.labels = ["left", "right", "up", "square", "triangle", "smiley", "background"]
+
+        if image is None:
+            # Handle the case when the image is not valid
+            print("Invalid image format")
+        else:
             # Convert and filter HSV 
-            if image is not None:
-                hsv_image = self.to_hsv(image)
-                # Filter the images to keep only the red color
-                mask = self.filter_hsv(hsv_image)
-                # Post process the image to remove noise
-                processed_mask = self.post_process(mask)
-                # Get the largest ROI from the list of ROIs
-                roi_list = self.get_rois(processed_mask, image)
-                # print ("ROI LIST", roi_list)
-                # for roi in roi_list:
-                #     self.show_image("ROI", roi)
+            hsv_image = self.to_hsv(image)
+            # Filter the images to keep only the red color
+            mask = self.filter_hsv(hsv_image)
+            # Post process the image to remove noise
+            processed_mask = self.post_process(mask)
+            # Get the largest ROI from the list of ROIs
+            roi_array = self.get_rois(processed_mask, image)
+            # print ("ROI LIST", roi_array)
 
-                if roi_list.any() and not self.collect:
-                    label_images = self.predict(roi_list)
-                    label_idx = np.argmax(label_images)
-                    # print the sign 
-                    print(self.labels[label_idx])
 
+            if roi_array.any() and not self.collect:
+                label_images = self.predict(roi_array)
+                label_idx = np.argmax(label_images)
+                # print the sign 
+                print(self.labels[label_idx])
+
+
+
+
+            # If self.collect == True
+            # Append the ROI image to self.collectedROIs (it will be saved once the node closes)
+
+            if roi_array.any() and self.collect:    
+                [self.collectedROIs.append(roi) for roi in roi_array]
 
 
             # Return the label of the ROI
             return label_idx
-
-        # If self.collect == True
-        # Append the ROI image to self.collectedROIs (it will be saved once the node closes)
-        if self.collect == True:
-            [self.collectedROIs.append(roi) for roi in roi_list]
+            
 
 
 
@@ -163,7 +168,7 @@ class SignRecognizer:
         #   return the found label(s) 
         
 
-    
+
     # When data collection mode is one, the data will be saved on a numpy file when the program is closed
     def save_data(self):
         data = np.asarray(self.collectedROIs)
