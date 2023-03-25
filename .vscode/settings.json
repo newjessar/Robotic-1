@@ -1,10 +1,10 @@
 {
-    "python.autoComplete.extraPaths": [
-        "/usr/lib/python2.7/dist-packages/cv2.x86_64-linux-gnu.so",
-        "/home/student/.local/lib/python2.7/site-packages"
-    ],
-    "python.analysis.extraPaths": [
-        "/usr/lib/python2.7/dist-packages/cv2.x86_64-linux-gnu.so",
-        "/home/student/.local/lib/python2.7/site-packages"
-    ]
+    // "python.autoComplete.extraPaths": [
+    //     "/usr/lib/python2.7/dist-packages/cv2.x86_64-linux-gnu.so",
+    //     "/home/student/.local/lib/python2.7/site-packages"
+    // ],
+    // "python.analysis.extraPaths": [
+    //     "/usr/lib/python2.7/dist-packages/cv2.x86_64-linux-gnu.so",
+    //     "/home/student/.local/lib/python2.7/site-packages"
+    // ]
 }
