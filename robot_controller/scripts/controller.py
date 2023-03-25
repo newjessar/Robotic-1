@@ -10,7 +10,7 @@ from bot_message.srv import SetSpeed, SetSpeedResponse
 class Controller(object):
 
   def __init__(self):
-    self.forward_speed = 1.2 # Set the starting forward speed, DO NOT CHANGE
+    self.forward_speed = 0.7 # Set the starting forward speed, DO NOT CHANGE
     self.lane_follower = LaneFollower(self.forward_speed)
     self.object_tracker = ObjectTracker()
     self.laser_data = LaserData(self.laser_callback)
@@ -19,8 +19,8 @@ class Controller(object):
     self.old_speed = 0.0
     
     # Change the parameter depending on if you are collecting data or using a trained network to predict. 
-    # self.sign_recognizer = SignRecognizer(data_collection_mode = False, data_filename = "training")
-    self.sign_recognizer = SignRecognizer(data_collection_mode = True, data_filename = "training") 
+    self.sign_recognizer = SignRecognizer(data_collection_mode = False, data_filename = "training")
+    # self.sign_recognizer = SignRecognizer(data_collection_mode = True, data_filename = "training") 
 
     # Service definitions
     self.switch_left_service = rospy.Service("/switch_left", Empty, self.initiate_switch_left)

@@ -105,8 +105,12 @@ class SignRecognizer:
         return label_images
 
 
-    # Classify and save the data to a file
+    def process(self, image):
+        pass
+
+    # # Classify and save the data to a file
     def classify(self, image):
+    
 
         label_images = 0
         label_idx = -1
