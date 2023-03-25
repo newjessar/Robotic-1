@@ -134,21 +134,8 @@ class SignRecognizer:
                 if roi_list.any() and not self.collect:
                     label_images = self.predict(roi_list)
                     label_idx = np.argmax(label_images)
-                    
-                    if label_idx == 0:
-                        print(self.labels[0])
-                    elif label_idx == 1:
-                        print(self.labels[1])
-                    elif label_idx == 2:
-                        print(self.labels[2])
-                    elif label_idx == 3:
-                        print(self.labels[3])
-                    elif label_idx == 4:
-                        print(self.labels[4])
-                    elif label_idx == 5:
-                        print(self.labels[5])
-                    elif label_idx == 6:
-                        print(self.labels[6])
+                    # print the sign 
+                    print(self.labels[label_idx])
 
 
 
