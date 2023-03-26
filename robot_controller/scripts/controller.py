@@ -2,26 +2,26 @@
 import rospy 
 from lane_follower import LaneFollower
 from laser_data import LaserData
-from sign_recognizer import SignRecognizer
 from object_tracker import ObjectTracker
+from sign_recognizer import SignRecognizer
 from std_srvs.srv import Empty, EmptyResponse
 from bot_message.srv import SetSpeed, SetSpeedResponse
 
 class Controller(object):
 
   def __init__(self):
-    self.forward_speed = 0.7 # Set the starting forward speed, DO NOT CHANGE
-    self.lane_follower = LaneFollower(self.forward_speed)
-    self.object_tracker = ObjectTracker()
-    self.laser_data = LaserData(self.laser_callback)
-
+    self.forward_speed = 0.0 # Set the starting forward speed, DO NOT CHANGE
     # temprery speed for the lane follower
     self.old_speed = 0.0
     
     # Change the parameter depending on if you are collecting data or using a trained network to predict. 
-    self.sign_recognizer = SignRecognizer(data_collection_mode = False, data_filename = "training")
-    # self.sign_recognizer = SignRecognizer(data_collection_mode = True, data_filename = "training") 
-
+    self.signs_recognizer = SignRecognizer(data_collection_mode = False, data_filename = "training")
+    # self.signs_recognizer = SignRecognizer(data_collection_mode = True, data_filename = "training") 
+    
+    # It was a requiremnt to initialize sign_recognizer before other classes
+    self.lane_follower = LaneFollower(self.forward_speed)
+    self.object_tracker = ObjectTracker()
+    self.laser_data = LaserData(self.laser_callback)
     # Service definitions
     self.switch_left_service = rospy.Service("/switch_left", Empty, self.initiate_switch_left)
     self.switch_right_service = rospy.Service("/switch_right", Empty, self.initiate_switch_right)
@@ -65,11 +65,22 @@ class Controller(object):
     return EmptyResponse()
   
 
+  # call the sign recognizer callback function
+  def signs_detection_callback(self):
+    sign = None
+    if self.signs_recognizer:
+        sign = self.signs_recognizer.classify(self.lane_follower.original_image)
+      
+    return sign
+
+
   # Laser callback function, gets called at 10Hz
   def laser_callback(self, laser_msg):
     # Get the laser data in cartesian coordinates
     data = self.laser_data.convert_to_cartesian(laser_msg)
-
+    if self.signs_detection_callback() is not None:
+        sign = self.signs_detection_callback()
+        # print("sign: ", sign)
     
     if data:
         cluster = self.laser_data.cluster(data)
@@ -110,13 +121,10 @@ class Controller(object):
 
               self.lane_follower.forward_speed = self.old_speed
               self.old_speed = 0.0   
+ 
 
-    self.signs_detection_callback()      
 
-  # call the sign recognizer callback function
-  def signs_detection_callback(self):
-    # call the sign recognizer callback function and semd the orignal image
-    self.sign_recognizer.classify(self.lane_follower.original_image)
+
 
 
 
