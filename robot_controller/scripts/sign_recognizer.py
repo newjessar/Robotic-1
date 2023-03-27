@@ -16,9 +16,14 @@ class SignRecognizer:
         self.ROI = None
         self.roi_classification_size = 28
         self.collectedROIs = []
+        self.array_of_signs = []
 
         self.collect = data_collection_mode
         self.data_filename = data_filename
+
+        if self.array_of_signs:
+            rospy.on_shutdown(self.to_NPZ(self.array_of_signs))
+
         
         if self.collect: # If collecting data, run save function on shutdown
             rospy.on_shutdown(self.save_data)
@@ -27,6 +32,10 @@ class SignRecognizer:
             # Run the network once since first time it is slow
             fake_image = np.zeros((self.roi_classification_size, self.roi_classification_size, 3))
             self.model.predict(np.asarray([fake_image]))
+    
+    def to_NPZ(self, data):
+        data_array = np.asarray(self.array_of_signs)
+        # np.savez('arrays.npz', data_array)
 
 
     def to_hsv(self, image):
@@ -109,19 +118,49 @@ class SignRecognizer:
         # # Create and show the limited image
         # limited_image = image[:, min_x_limit:max_x_limit]
         
-        half_image_width = image.shape[1] // 2
+        width_image_half = image.shape[1] // 2  # X = 1600 / 2 = 800
+        height_image_half = image.shape[0] * 0.5  # Y = 800 / 2 = 400
+        
         # Loop through the contours and extract the ROIs
         for contour in contours:
             [x, y, w, h] = cv2.boundingRect(contour)
-
             if 65 < w < 170 and 65 < h < 170:
-                if x < half_image_width:  # Left lane
-                    # Add any additional constraints for the left lane here
-                    print("Left side traffic sign")
+                print("x: ", x, "y: ", y, "w: ", w, "h: ", h)
+                if x:
+                    self.array_of_signs.append([x, y, w, h])
                 
-                else:  # Right lane
-                    # Add any additional constraints for the right lane here
-                    print("Right side traffic sign")
+
+
+   
+
+            aspect_ratio = w / h
+            aspect_ratio_tolerance = 0.1
+
+            # Common constraints for all cases
+            if 65 < w < 170 and 65 < h < 170 and y < height_image_half:
+
+                # Left lane
+                if x < width_image_half:
+                    if (
+                        (0.65 - aspect_ratio_tolerance) < aspect_ratio < (0.65 + aspect_ratio_tolerance) or
+                        (1.74 - aspect_ratio_tolerance) < aspect_ratio < (1.74 + aspect_ratio_tolerance)
+                    ):
+                        print("Left side traffic sign")
+                    else:
+                        continue
+
+                # Right lane
+                else:
+                    if (
+                        (1.00 - aspect_ratio_tolerance) < aspect_ratio < (1.00 + aspect_ratio_tolerance) or
+                        (2.46 - aspect_ratio_tolerance) < aspect_ratio < (2.46 + aspect_ratio_tolerance)
+                    ):
+                        print("Right side traffic sign")
+                    else:
+                        continue
+
+            
+
                  
 
                 # Check if the traffic sign is within the horizontal limits
@@ -133,6 +172,9 @@ class SignRecognizer:
 
                     cv2.imshow("roi", output)
                     cv2.waitKey(1)
+
+        data_array = np.asarray(self.array_of_signs)
+        np.savez('arraysSINGLE_LS.npz', data_array)    
 
         return arr_rois
 

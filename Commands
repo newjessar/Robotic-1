@@ -12,6 +12,7 @@ rosservice call /bot1/set_speed "speed: 0.0"
 
 rosrun keyboard_teleop keyboard_teleop_node
 rosservice call /set_speed "speed: 1.2"
+rosservice call /set_speed "speed: 0.7"
 rosservice call /switch_left
 rosservice call /switch_right
 

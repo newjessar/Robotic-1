@@ -10,7 +10,7 @@ from bot_message.srv import SetSpeed, SetSpeedResponse
 class Controller(object):
 
   def __init__(self):
-    self.forward_speed = 0.0 # Set the starting forward speed, DO NOT CHANGE
+    self.forward_speed = 0.7 # Set the starting forward speed, DO NOT CHANGE
     # temprery speed for the lane follower
     self.old_speed = 0.0
     
@@ -67,11 +67,10 @@ class Controller(object):
 
   # call the sign recognizer callback function
   def signs_detection_callback(self):
-    sign = None
-    if self.signs_recognizer:
-        sign = self.signs_recognizer.classify(self.lane_follower.original_image)
-      
-    return sign
+    # sign = None
+    # if self.signs_recognizer:
+      sign = self.signs_recognizer.classify(self.lane_follower.original_image)
+      return sign
 
 
   # Laser callback function, gets called at 10Hz
@@ -80,7 +79,7 @@ class Controller(object):
     data = self.laser_data.convert_to_cartesian(laser_msg)
     if self.signs_detection_callback() is not None:
         sign = self.signs_detection_callback()
-        # print("sign: ", sign)
+        print("sign: ", sign)
     
     if data:
         cluster = self.laser_data.cluster(data)
@@ -122,10 +121,6 @@ class Controller(object):
               self.lane_follower.forward_speed = self.old_speed
               self.old_speed = 0.0   
  
-
-
-
-
 
 
    
