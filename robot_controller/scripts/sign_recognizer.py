@@ -72,12 +72,6 @@ class SignRecognizer:
 
 
     def get_rois(self, filtered_image, image):
-        
-
-        # self.show_image("limited_image", image)
-        # # self.show_image("image", image)
-
-
 
         contours = self.find_contours(filtered_image)
         arr_rois = []
@@ -89,32 +83,18 @@ class SignRecognizer:
                 print("2- x: ", x, "y: ", y, "w: ", w, "h: ", h)
                 if x:
                     self.array_of_signs.append([x, y, w, h])
-                if 312 < x < 1100:
-                    print(">>>>>>>>>>>>>>>>>>>>>>>>>>> x is here")
-                    # if x < 1100 and x > 190: # 1- Excluding the right lane signs while driving on the left lane
-                #     # 2- Excluding half of the left lanes signs while driving on the right lane
-                #     if (x < 425): # 2- Rest of x values for the left lane
-                #         if (280 > y > 130):
-                #             print("x: ", x, "y: ", y, "w: ", w, "h: ", h)
-                #             print("Excludeded")
-                #             continue
-                #         else:
-                #             print("1- x: ", x, "y: ", y, "w: ", w, "h: ", h)
-                #             cropped_image = image[y:y+h, x:x+w]
-                #             size = (self.roi_classification_size, self.roi_classification_size)
-                #             output = cv2.resize(cropped_image, size, interpolation=cv2.INTER_AREA)
-                #             arr_rois.append(output)
-
-                #             cv2.imshow("roi", output)
-                #             cv2.waitKey(1)
-                #     else:
-                    cropped_image = image[y:y+h, x:x+w]
-                    size = (self.roi_classification_size, self.roi_classification_size)
-                    output = cv2.resize(cropped_image, size, interpolation=cv2.INTER_AREA)
-                    arr_rois.append(output)
-
-                    cv2.imshow("roi", output)
-                    cv2.waitKey(1)
+                if 312 < x < 1180:
+                    if (x > 1160 and y > 200):
+                        continue
+                    else:
+                        cropped_image = image[y:y+h, x:x+w]
+                        size = (self.roi_classification_size, self.roi_classification_size)
+                        output = cv2.resize(cropped_image, size, interpolation=cv2.INTER_AREA)
+                        arr_rois.append(output)
+                        # Shwoing the ROI
+                        cv2.imshow("roi", output)
+                        cv2.waitKey(1)
+        # Save the data for further Analysis
         # data_array = np.asarray(self.array_of_signs)
         # np.savez('bROIRL.npz', data_array)    
 
@@ -136,29 +116,6 @@ class SignRecognizer:
 
     # # Classify and save the data to a file
     def classify(self, image):
-        # min_x_limit = int(image.shape[1] * 0.25)  # 30% from the left side of the image
-        # max_x_limit = int(image.shape[1] * 0.75)  # 70% from the left side of the image
-
-        # min_y_limit = 0  # Start from the top of the image
-        # max_y_limit = image.shape[0]  # End at the bottom of the image
-
-        # # Create and show the limited image
-        # limited_image = image[min_y_limit:max_y_limit, min_x_limit:max_x_limit]
-
-        # showing the warped image
-        # self.show_image("warped_image_copy", mask)
-
-        # Use the mask to find the contours (which should be rectangles indicating a sign)
-        # For each contour extract the rectangle (ROI, Region of Interest)
-        #   Filter out to small and to large signs, the robot should not react to signs that are far away.
-        #   To get the rectangle use [x, y, w, h] = cv2.boundingRect(countour) 
-        #   To extract a ROI from an image use image[y1: y2, x1: x2] 
-        # Resize the extracted ROI to self.roi_classification_size x self.roi_classification_size
-        # If collecting data, 
-        # Else classify the image using the trained CNN.
-        #   return the found label(s) 
-        
-
 
         # If self.collect == False
         #     Return either 1 ROI, or return the label of that ROI 
@@ -213,49 +170,3 @@ class SignRecognizer:
         np.save(os.path.join(self.path, "{0}.npy".format(self.data_filename)), data)
         print ("Saved data")
 
-
-# RR
-# ('2- x: ', 912, 'y: ', 235, 'w: ', 92, 'h: ', 91)
-# ('2- x: ', 937, 'y: ', 209, 'w: ', 107, 'h: ', 106)
-# ('sign: ', 5)
-# ('2- x: ', 945, 'y: ', 195, 'w: ', 114, 'h: ', 114)
-# ('2- x: ', 958, 'y: ', 180, 'w: ', 123, 'h: ', 122)
-# ('sign: ', 5)
-# ('2- x: ', 977, 'y: ', 154, 'w: ', 137, 'h: ', 137)
-# ('2- x: ', 1004, 'y: ', 122, 'w: ', 156, 'h: ', 155)
-# ('sign: ', 5)
-
-# RL
-# ('2- x: ', 304, 'y: ', 236, 'w: ', 93, 'h: ', 91)
-# ('2- x: ', 190, 'y: ', 200, 'w: ', 115, 'h: ', 111)
-# ('sign: ', 5)
-# ('2- x: ', 115, 'y: ', 175, 'w: ', 131, 'h: ', 125)
-# ('2- x: ', 64, 'y: ', 157, 'w: ', 141, 'h: ', 135)
-# ('sign: ', 5)
-# ('2- x: ', 0, 'y: ', 135, 'w: ', 154, 'h: ', 147)
-# ('sign: ', None)
-
-
-# LL
-# ('2- x: ', 566, 'y: ', 236, 'w: ', 91, 'h: ', 91)
-# ('2- x: ', 499, 'y: ', 204, 'w: ', 110, 'h: ', 109)
-# ('sign: ', 5)
-# ('2- x: ', 502, 'y: ', 186, 'w: ', 120, 'h: ', 119)
-# ('2- x: ', 500, 'y: ', 175, 'w: ', 126, 'h: ', 125)
-# ('sign: ', 5)
-# ('2- x: ', 493, 'y: ', 164, 'w: ', 131, 'h: ', 131)
-# ('2- x: ', 476, 'y: ', 150, 'w: ', 140, 'h: ', 139)
-# ('sign: ', 5)
-# ('2- x: ', 239, 'y: ', 35, 'w: ', 153, 'h: ', 91)
-# ('sign: ', None)
-
-#LR
-# ('2- x: ', 1182, 'y: ', 235, 'w: ', 94, 'h: ', 91)
-# ('2- x: ', 1196, 'y: ', 228, 'w: ', 98, 'h: ', 96)
-# ('sign: ', 3)
-# ('2- x: ', 1227, 'y: ', 213, 'w: ', 107, 'h: ', 104)
-# ('2- x: ', 1285, 'y: ', 190, 'w: ', 121, 'h: ', 117)
-# ('sign: ', 3)
-# ('2- x: ', 1339, 'y: ', 167, 'w: ', 135, 'h: ', 130)
-# ('2- x: ', 1382, 'y: ', 147, 'w: ', 146, 'h: ', 141)
-# ('sign: ', 3)
