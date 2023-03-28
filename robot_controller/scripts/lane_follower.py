@@ -345,8 +345,8 @@ class LaneFollower(object):
     else:
           omega = self.old_omega
 
-    if self.forward_speed == 0.0:
-          omega = 0.0
+    # if self.forward_speed == 0.0:
+    #       omega = 0.0
           
     # Send velocity
     self.send_velocity(omega)
