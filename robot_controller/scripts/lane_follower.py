@@ -223,12 +223,7 @@ class LaneFollower(object):
         kp = 0.02
       else:
         kp = 0.035
-    else:
-      # Exponential decay parameters
-      C = 0.033  # initial kp value
-      D = 0.01  # decay rate
-      # Calculate the dynamic kp value based on the error 
-      kp = C * np.exp(-D * abs(error))
+
 
     omega = (self.forward_speed * kp) * error
     return omega
