@@ -204,6 +204,7 @@ class LaneFollower(object):
     if key == ord('s'): # Pressing 's' will save the image
       cv2.imwrite("lane_follower_image.png", image)
 
+
   # Calculate the rotational velocity
   # width of the lane, mean left line, and mean right line
   def calculate_omega(self, mean_left, mean_right, width):
@@ -223,7 +224,12 @@ class LaneFollower(object):
         kp = 0.02
       else:
         kp = 0.035
-
+    else:
+      # Exponential decay parameters
+      C = 0.033  # initial kp value
+      D = 0.01  # decay rate
+      # Calculate the dynamic kp value based on the error 
+      kp = C * np.exp(-D * abs(error))
 
     omega = (self.forward_speed * kp) * error
     return omega
@@ -345,8 +351,6 @@ class LaneFollower(object):
     else:
           omega = self.old_omega
 
-    # if self.forward_speed == 0.0:
-    #       omega = 0.0
           
     # Send velocity
     self.send_velocity(omega)
