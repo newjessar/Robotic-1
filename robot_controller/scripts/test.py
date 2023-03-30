@@ -7,7 +7,7 @@ h = 0
 width_image_half = 800
 loaded_data1 =[]
 
-with np.load("/home/student/catkin_ws/src/students22/robot_controller/scripts/bROIRL.npz") as data:
+with np.load("/home/student/catkin_ws/src/students22/robot_controller/scripts/bROILR.npz") as data:
     loaded_data1 = data['arr_0']
 
 # Remove repeated rows using numpy.unique
@@ -16,9 +16,8 @@ for i in unique_data_array:
     [x, y, w, h] = i
     print("x: ", x, "y: ", y, "w: ", w, "h: ", h)
     
-    if 55 < w < 155 and 55 < h < 155:
+    if 100 < w < 155 and 100 < h < 155:
             if 312 < x < 1180:
-
                 if (x > 1160 and y > 200):
                     print("Excludeded")
         # if x < 1100 and x > 190: # 1- Excluding the right lane signs while driving on the left lane
@@ -28,10 +27,59 @@ for i in unique_data_array:
         #             print("Excludeded")
         #         else:
         #             print("!!!!!!!!!>>>>>>>>>>>>>>>Passed")
-        #     else:
-                print("!!!!!!!!!>>>>>>>>>>>>>>>Passed")
+                else:
+                    print("!!!!!!!!!>>>>>>>>>>>>>>>Passed")
                     
                     
+
+# Exception Eegde: coming from single lane at the joint an oppsit trafic sign was spotted at 1.2 speed not 0.7
+# ('2- x: ', 1166, 'y: ', 232, 'w: ', 95, 'h: ', 93)
+# left
+
+# ('2- x: ', 1105, 'y: ', 215, 'w: ', 109, 'h: ', 103)
+# left
+
+# ('2- x: ', 1118, 'y: ', 235, 'w: ', 92, 'h: ', 91)
+# left
+
+# ('2- x: ', 1147, 'y: ', 236, 'w: ', 92, 'h: ', 91)
+# left
+
+# ('2- x: ', 1224, 'y: ', 214, 'w: ', 106, 'h: ', 103)
+# left
+
+# ('x: ', 1151, 'y: ', 233, 'w: ', 93, 'h: ', 92)
+# left
+
+# ('x: ', 1140, 'y: ', 236, 'w: ', 91, 'h: ', 91)
+# left
+
+# ('x: ', 1167, 'y: ', 142, 'w: ', 128, 'h: ', 144)
+# left
+
+# ('x: ', 1167, 'y: ', 154, 'w: ', 124, 'h: ', 137)
+# left
+
+# ('x: ', 1112, 'y: ', 144, 'w: ', 123, 'h: ', 143)
+# left
+
+
+
+##### Second edge on the corner north west
+# ('x: ', 319, 'y: ', 233, 'w: ', 95, 'h: ', 93)
+# square
+
+### Third edge couple of chamged signs
+# ('x: ', 411, 'y: ', 226, 'w: ', 101, 'h: ', 97)
+# ('x: ', 398, 'y: ', 208, 'w: ', 112, 'h: ', 107)
+# ('x: ', 390, 'y: ', 201, 'w: ', 116, 'h: ', 111)
+# ('x: ', 372, 'y: ', 174, 'w: ', 131, 'h: ', 126)
+# ('x: ', 372, 'y: ', 149, 'w: ', 145, 'h: ', 139)
+
+
+
+
+
 
 # RR
 # 883 < x < 1452 and 0 < y < 300 || 56 < W < 143 and 56 < H < 140
@@ -71,21 +119,6 @@ for i in unique_data_array:
 # ('2- x: ', 1236, 'y: ', 54, 'w: ', 120, 'h: ', 136)
 # ('2- x: ', 1253, 'y: ', 28, 'w: ', 128, 'h: ', 146)
 
-# Exception Eegde: coming from single lane at the joint an oppsit trafic sign was spotted at 1.2 speed not 0.7
-# ('2- x: ', 1166, 'y: ', 232, 'w: ', 95, 'h: ', 93)
-# >>>>>>>>>>>>>>>>>>>>>>>>>>> x is here
-
-# ('2- x: ', 1105, 'y: ', 215, 'w: ', 109, 'h: ', 103)
-# >>>>>>>>>>>>>>>>>>>>>>>>>>> x is here
-
-# ('2- x: ', 1118, 'y: ', 235, 'w: ', 92, 'h: ', 91)
-# >>>>>>>>>>>>>>>>>>>>>>>>>>> x is here
-
-# ('2- x: ', 1147, 'y: ', 236, 'w: ', 92, 'h: ', 91)
-# >>>>>>>>>>>>>>>>>>>>>>>>>>> x is here
-
-# ('2- x: ', 1224, 'y: ', 214, 'w: ', 106, 'h: ', 103)
-# ('sign: ', None)
 
 
 

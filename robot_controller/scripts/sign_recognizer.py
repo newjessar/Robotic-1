@@ -11,23 +11,23 @@ class SignRecognizer:
     def __init__(self, data_collection_mode = False, data_filename = None):
 
         self.labels = ["left", "right", "up", "square", "triangle", "smiley", "background"]
-        # Data should be stored in /home/username/data/
-        self.path = os.path.join(os.environ["HOME"], "data")
-        self.ROI = None
-        self.roi_classification_size = 28
-        self.collectedROIs = []
-        self.array_of_signs = []
+        # # Data should be stored in /home/username/data/
+        # self.path = os.path.join(os.environ["HOME"], "data")
+        # self.ROI = None
+        # self.roi_classification_size = 28
+        # self.collectedROIs = []
+        # self.array_of_signs = []
 
-        self.collect = data_collection_mode
-        self.data_filename = data_filename
+        # self.collect = data_collection_mode
+        # self.data_filename = data_filename
 
-        if self.collect: # If collecting data, run save function on shutdown
-            rospy.on_shutdown(self.save_data)
-        else: # Else load the network and run the predict function once
-            self.model = tf.keras.models.load_model(os.path.join(os.environ["HOME"] + "/network_model", "model_classifier.h5"))
-            # Run the network once since first time it is slow
-            fake_image = np.zeros((self.roi_classification_size, self.roi_classification_size, 3))
-            self.model.predict(np.asarray([fake_image]))
+        # if self.collect: # If collecting data, run save function on shutdown
+        #     rospy.on_shutdown(self.save_data)
+        # else: # Else load the network and run the predict function once
+        #     self.model = tf.keras.models.load_model(os.path.join(os.environ["HOME"] + "/network_model", "model_classifier.h5"))
+        #     # Run the network once since first time it is slow
+        #     fake_image = np.zeros((self.roi_classification_size, self.roi_classification_size, 3))
+        #     self.model.predict(np.asarray([fake_image]))
 
 
     def to_hsv(self, image):
@@ -79,14 +79,14 @@ class SignRecognizer:
         # Loop through the contours and extract the ROIs
         for contour in contours:
             [x, y, w, h] = cv2.boundingRect(contour)
-            if 90 < w < 155 and 90 < h < 155:
-                print("2- x: ", x, "y: ", y, "w: ", w, "h: ", h)
+            if 96 < w < 155 and 96 < h < 155:
                 if x:
                     self.array_of_signs.append([x, y, w, h])
                 if 312 < x < 1180:
                     if (x > 1160 and y > 200):
                         continue
                     else:
+                        # print("x: ", x, "y: ", y, "w: ", w, "h: ", h)
                         cropped_image = image[y:y+h, x:x+w]
                         size = (self.roi_classification_size, self.roi_classification_size)
                         output = cv2.resize(cropped_image, size, interpolation=cv2.INTER_AREA)
@@ -146,19 +146,19 @@ class SignRecognizer:
                 # print the sign 
                 # print("label_idx", label_idx)
                 # print(self.labels[label_idx])
-            else:
-                label_idx = None
+
 
 
             # If self.collect == True
             # Append the ROI image to self.collectedROIs (it will be saved once the node closes)
             # if roi_array and self.collect:    
                 # [self.collectedROIs.append(roi) for roi in roi_array]
-            for item in roi_array:
-                self.collectedROIs.append(item)
+            if roi_array and self.collect:
+                for item in roi_array:
+                    self.collectedROIs.append(item)
 
             # Return the label of the ROI
-            return label_idx if label_idx != None else None
+            return label_idx+1 if label_idx != None else None
 
 
     # When data collection mode is one, the data will be saved on a numpy file when the program is closed

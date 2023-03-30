@@ -11,21 +11,24 @@ class Controller(object):
 
   def __init__(self):
     self.forward_speed = 0.7 # Set the starting forward speed, DO NOT CHANGE
-    # temprery speed for the lane follower
-    self.old_speed = 0.0
+    # # temprery speed for the lane follower
+    # self.old_speed = 0.0
     
-    # Change the parameter depending on if you are collecting data or using a trained network to predict. 
-    self.signs_recognizer = SignRecognizer(data_collection_mode = False, data_filename = "training")
-    # self.signs_recognizer = SignRecognizer(data_collection_mode = True, data_filename = "training") 
+    # # Change the parameter depending on if you are collecting data or using a trained network to predict. 
+    # self.signs_recognizer = SignRecognizer(data_collection_mode = False, data_filename = "training")
+    # # self.signs_recognizer = SignRecognizer(data_collection_mode = True, data_filename = "training") 
     
-    # It was a requiremnt to initialize sign_recognizer before other classes
-    self.lane_follower = LaneFollower(self.forward_speed)
-    self.object_tracker = ObjectTracker()
-    self.laser_data = LaserData(self.laser_callback)
-    # Service definitions
-    self.switch_left_service = rospy.Service("/switch_left", Empty, self.initiate_switch_left)
-    self.switch_right_service = rospy.Service("/switch_right", Empty, self.initiate_switch_right)
-    self.set_speed_service = rospy.Service("/set_speed", SetSpeed, self.set_speed_callback)
+    # # It was a requiremnt to initialize sign_recognizer before other classes
+    # self.lane_follower = LaneFollower(self.forward_speed)
+    # self.object_tracker = ObjectTracker()
+    # self.laser_data = LaserData(self.laser_callback)
+    # # Service definitions
+    # self.switch_left_service = rospy.Service("/switch_left", Empty, self.initiate_switch_left)
+    # self.switch_right_service = rospy.Service("/switch_right", Empty, self.initiate_switch_right)
+    # self.set_speed_service = rospy.Service("/set_speed", SetSpeed, self.set_speed_callback)
+    # self.last_sign = None
+    # self.turning_issue = 3
+
 
   # Command via terminal to call this function: rosservice call /set_speed "speed: 0.0"
   def set_speed_callback(self, speed_msg):
@@ -67,59 +70,102 @@ class Controller(object):
 
   # call the sign recognizer callback function
   def signs_detection_callback(self):
-    # sign = None
-    # if self.signs_recognizer:
-      sign = self.signs_recognizer.classify(self.lane_follower.original_image)
-      return sign
+      
+      sign = None
+      # sign = (self.signs_recognizer.classify(self.lane_follower.original_image))
+      # if sign != None:
+      #     if self.last_sign != sign:
+      #         print(self.signs_recognizer.labels[sign-1])
+      #         self.last_sign = sign
+          
+          
+      #     if sign == 1:
+      #       self.turning_issue = sign
+
+      #     elif sign == 2:
+      #       self.turning_issue = sign
+
+      #     elif sign == 3:
+      #       self.turning_issue = sign
+
+      #     elif sign == 4:
+      #       self.lane_follower.forward_speed = 0.7
+
+      #     elif sign == 5:
+      #       self.lane_follower.forward_speed = 1.2
 
 
   # Laser callback function, gets called at 10Hz
   def laser_callback(self, laser_msg):
+
+    # print("             turn left", self.lane_follower.switch_left)
+    # print("                             turn right", self.lane_follower.switch_right)
+
+    # print(self.last_sign)
     # Get the laser data in cartesian coordinates
     data = self.laser_data.convert_to_cartesian(laser_msg)
-    if self.signs_detection_callback() is not None:
-        sign = self.signs_detection_callback()
-        print("sign: ", sign)
+    # self.signs_detection_callback()
     
+    # # check if there are any restrictions on turning
+    # if self.turning_issue == 1:
+    #     # print("leftish")
+    #     self.lane_follower.switch_left = True
+    #     self.lane_follower.switch_right = False
+
+
+    # elif self.turning_issue == 2:
+    #     # print("rightish")
+    #     self.lane_follower.switch_right = True
+    #     self.lane_follower.switch_left = False
+
+        
+    
+    # elif self.turning_issue == 3:
+    #     # print("stop")
+    #     self.lane_follower.switch_right = False
+    #     self.lane_follower.switch_left = False
+
+    
+    # check if there are any objects in front, left or right of the robot
     if data:
         cluster = self.laser_data.cluster(data)
-        self.object_tracker.check_lanes(cluster)  
+        # self.object_tracker.check_lanes(cluster)  
 
-        # if object on the left lane
-        if self.lane_follower.left_lane_exist:         
-          if self.object_tracker.lane_occupied["left_lane"]:
-              self.lane_follower.left_onhold = True
-          else:
-              self.lane_follower.left_onhold = False
-        else:
-              if not self.object_tracker.lane_occupied["left_lane"]:
-                  self.lane_follower.left_onhold = False
+        # # if object on the left lane
+        # if self.lane_follower.left_lane_exist:         
+        #   if self.object_tracker.lane_occupied["left_lane"]:
+        #       self.lane_follower.right_object = True
+        #   else:
+        #       self.lane_follower.right_object = False
+        # else:
+        #       if not self.object_tracker.lane_occupied["left_lane"]:
+        #           self.lane_follower.right_object = False
 
-        # if object on the right lane
-        if self.lane_follower.right_lane_exist:   
-          if self.object_tracker.lane_occupied["right_lane"]:
-              self.lane_follower.right_onhold = True
-          else:
-              self.lane_follower.right_onhold = False
-        else:
-              if not self.object_tracker.lane_occupied["right_lane"]:
-                  self.lane_follower.right_onhold = False
+        # # if object on the right lane
+        # if self.lane_follower.right_lane_exist:   
+        #   if self.object_tracker.lane_occupied["right_lane"]:
+        #       self.lane_follower.right_object = True
+        #   else:
+        #       self.lane_follower.right_object = False
+        # else:
+        #       if not self.object_tracker.lane_occupied["right_lane"]:
+        #           self.lane_follower.right_object = False
 
-        # if object in front
-        if self.object_tracker.lane_occupied["front"]:
-          self.lane_follower.switch_left = True
-          self.lane_follower.switch_right = True
-          if (not self.lane_follower.left_lane_exist and not self.lane_follower.right_lane_exist) or (self.object_tracker.lane_occupied["left_lane"] or self.object_tracker.lane_occupied["right_lane"]) or (not self.lane_follower.straight_path):
+        # # if object in front
+        # if self.object_tracker.lane_occupied["front"]:
+        #   self.lane_follower.switch_left = True
+        #   self.lane_follower.switch_right = True
+        #   if (not self.lane_follower.left_lane_exist and not self.lane_follower.right_lane_exist) or (self.object_tracker.lane_occupied["left_lane"] or self.object_tracker.lane_occupied["right_lane"]) or (not self.lane_follower.straight_path):
               
-              if self.old_speed == 0.0:
-                  self.old_speed = self.lane_follower.forward_speed
-                  self.lane_follower.forward_speed = 0.7   
-        else:
-           # nothing in front
-           if self.lane_follower.switch_left == False and self.lane_follower.switch_right == False and self.old_speed != 0.0:
+        #       if self.old_speed == 0.0:
+        #           self.old_speed = self.lane_follower.forward_speed
+        #           self.lane_follower.forward_speed = 0.7   
+        # else:
+        #    # nothing in front
+        #    if self.lane_follower.switch_left == False and self.lane_follower.switch_right == False and self.old_speed != 0.0:
 
-              self.lane_follower.forward_speed = self.old_speed
-              self.old_speed = 0.0   
+        #       self.lane_follower.forward_speed = self.old_speed
+        #       self.old_speed = 0.0   
  
 
 

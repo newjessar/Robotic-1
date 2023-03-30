@@ -38,11 +38,15 @@ class LaneFollower(object):
     self.switch_left = False
     self.switch_right = False
     self.old_omega = 0.0
-    self.left_onhold = False
-    self.right_onhold = False
+    self.left_object = False
+    self.right_object = False
     self.left_lane_exist = False
     self.right_lane_exist = False
     self.straight_path = False
+    self.left_sign = False
+    self.right_sign = False
+    self.left_turn_executed = False
+    self.right_turn_executed = False
 
     self.image_subscriber = rospy.Subscriber(image_topic, Image, self.image_callback, queue_size=1)
 
@@ -205,8 +209,40 @@ class LaneFollower(object):
       cv2.imwrite("lane_follower_image.png", image)
 
 
+
+  # # Calculate the rotational velocity
+  # # width of the lane, mean left line, and mean right line
+  # def calculate_omega(self, mean_left, mean_right, width):
+    
+  #   centerLane = (mean_left+mean_right)/2
+  #   error = width - centerLane
+  #   kp = 0.01
+  #   omega = 0
+
+  #   if self.forward_speed == 1.2:
+  #     if error > 100 or error < -100:
+  #         kp = 0.007
+  #     else:
+  #         kp = 0.01
+  #   elif self.forward_speed >= 0.7:
+  #     if error > 100 or error < -100:
+  #       kp = 0.007
+  #     else:
+  #       kp = 0.035
+  #   # else:
+  #   #   # Exponential decay parameters
+  #   #   C = 0.033  # initial kp value
+  #   #   D = 0.01  # decay rate
+  #   #   # Calculate the dynamic kp value based on the error 
+  #   #   kp = C * np.exp(-D * abs(error))
+
+  #   omega = (self.forward_speed * kp) * error
+  #   return omega
+    
+
+
+
   # Calculate the rotational velocity
-  # width of the lane, mean left line, and mean right line
   def calculate_omega(self, mean_left, mean_right, width):
 
     centerLane = (mean_left+mean_right)/2
@@ -224,30 +260,32 @@ class LaneFollower(object):
         kp = 0.02
       else:
         kp = 0.035
-    else:
-      # Exponential decay parameters
-      C = 0.033  # initial kp value
-      D = 0.01  # decay rate
-      # Calculate the dynamic kp value based on the error 
-      kp = C * np.exp(-D * abs(error))
+
 
     omega = (self.forward_speed * kp) * error
+
     return omega
     
   # Lane switcher function
   def lane_switcher(self, mean, mean_far, width):
-    # check to assure omega will not be altered during the turn
-    if self.left_angle == 0.0 and self.far_left_angle == 0.0:
-      # Check related to extended switching time in case no straight line is detected
-      if self.left_onhold == False and mean_far != None and mean != None:
-        omega = self.calculate_omega(mean_far, mean, width)
-        return omega
-      
-    # if self.switch_right:
-    if self.right_angle == 0.0 and self.far_right_angle == 0.0:
-      if self.right_onhold == False and mean_far != None and mean != None:
-        omega = self.calculate_omega(mean, mean_far, width)
-        return omega
+    # Check the conditions and preform the turn to the left
+      if self.switch_left == True:
+        if self.left_object == False and self.left_sign == False:
+          if self.left_angle == 0.0 and self.far_left_angle == 0.0:
+            if self.straight_path == True:
+                  if mean_far != None and mean != None:
+                        print("HEREEEEEEEEEEEEEEEEEEEEEEEEE")
+                        omega = self.calculate_omega(mean_far, mean, width)
+                        return omega
+                
+    # Check the conditions and preform the turn to the right
+      elif self.switch_right == True:
+          if self.right_object == False and self.right_sign == False:
+            if self.straight_path == True:
+                  if mean_far != None and mean != None:
+                        print("HEREEEEEEEEEEEEEEEEEEEEEEEEE")
+                        omega = self.calculate_omega(mean, mean_far, width)
+                        return omega
 
 
 
@@ -266,7 +304,6 @@ class LaneFollower(object):
     warped_image = self.warp_perspective(image)
     _, warped_image_width, _ = warped_image.shape # Get the height, width, channels from the warped image 
     middle = warped_image_width / 2 # Determine the center of the image 
-    segment_width = middle / 2 # Determine the width of each segment of the image
     
     ## Convert and filter HSV (use the calibrator to find correct HSV filter values)
     hsv_image = self.to_hsv(warped_image)
@@ -320,30 +357,48 @@ class LaneFollower(object):
     ## Lane switching, with restrains in case there is a coming turn approaching
     ## if you already have a turn message, then the turn will wait until the
     ## the lines are straight again or there is lane in genral
-    if self.left_onhold == False:
+    print("DO YOU", self.switch_left)
+    self.left_sign = False
+    print("mean far riht", mean_far_left)
+
+    # Check either lane if it exist
+    if (not (self.left_lane_exist == False and self.right_lane_exist == False)):
+      # Make the turn to the left lane
       if self.switch_left == True:
+          print("switch_left")
           if mean_far_left != None:
-              if self.straight_path:
+              if self.straight_path == True:
+                  print("Turn Left: ")
                   omega = self.lane_switcher(mean_left, mean_far_left, middle)
-
           else:
-                # edge case, the corners create a far right, holding the turn is required
-              if mean_far_right != None and self.left_onhold == False:
-                  self.switch_left = False
-                  self.far_right_angle = 0.0
-                  self.left_onhold = False
+              if mean_far_right != None and self.straight_path == True:
+                  if self.left_sign == False:
+                      print("Turned")
+                      self.switch_left = False
+                      self.far_right_angle = 0.0
 
-    if self.right_onhold == False:
+      # Make the turn to the right lane
       if self.switch_right == True:
+          print("switch_right")
           if mean_far_right != None:
-              if self.straight_path:
+              if self.straight_path == True:
+                  print("Turn Right: ")
                   omega = self.lane_switcher(mean_right, mean_far_right, middle)
-
           else:
-              if mean_far_left != None and self.right_onhold == False:
-                  self.switch_right = False
-                  self.far_left_angle = 0.0
-                  self.right_onhold = False
+              print("                   mean far left", mean_far_left, "Path", self.straight_path)
+              if mean_far_left != None and self.straight_path == True:
+                  if self.right_sign == False:
+                      print("Turned")
+                      self.switch_right = False
+                      self.far_left_angle = 0.0
+
+
+                    
+      
+
+
+
+
 
 
     if omega:
