@@ -186,6 +186,12 @@ class LaneFollower(object):
   # Function to send the velocity to the robot
   def send_velocity(self, omega): 
 
+    # omega = min(max(omega, -0.5), 0.5)
+    if omega > 0.5:
+        omega = 0.5
+    elif omega < -0.5:
+        omega = -0.5
+
     msg = Twist()
     msg.linear.x = self.forward_speed
     msg.angular.z = omega
@@ -247,37 +253,25 @@ class LaneFollower(object):
 
     centerLane = (mean_left+mean_right)/2
     error = width - centerLane
-    kp = 0.01
-    omega = 0
-    # print("Error: ", error)
-
-
-    if self.forward_speed == 1.2:
-      if error > 100 or error < -100:
-          kp = 0.007
-      else:
-          kp = 0.01
-    elif self.forward_speed == 0.7:
-      if error > 100 or error < -100:
-          kp = 0.02
-      else:
-          kp = 0.035
-
-
+    kp = 0.008
     omega = (self.forward_speed * kp) * error
 
     return omega
     
   # Lane switcher function
   def lane_switcher(self, mean, mean_far, width):
+      print("straight: ", self.straight_path)  
     # Check the conditions and preform the turn to the left
       if self.switch_left == True:
         print(">>>>>>>>>>>>>>>>>>>>SWITCHING LEFT")
         if self.left_object == False and self.left_sign == False:
           if self.left_angle == 0.0 and self.far_left_angle == 0.0:
+            print(">>>>>>>>>>>>>>>>>>>> Angles 0.0")
             if self.straight_path == True:
+                  print("straight path")
+                  print("Means: ", mean_far, mean)
                   if mean_far != None and mean != None:
-                        print("HEREEEEEEEEEEEEEEEEEEEEEEEEE")
+                        print("################################################Calculating omega")
                         omega = self.calculate_omega(mean_far, mean, width)
                         return omega
                 
@@ -346,10 +340,9 @@ class LaneFollower(object):
     if far_right.any():
         mean_far_right = np.mean((far_right[:, 0] + far_right[:, 2]) / 2)
     
-    omega = 0.0
+
     # calculating omega
-    if mean_left != None and mean_right != None:
-        omega = self.calculate_omega(mean_left, mean_right, middle)
+    omega = self.calculate_omega(mean_left, mean_right, middle)
 
     # check if a straight path is detected
     self.straight_path = True if self.straight_line_count >= 10 else False
@@ -361,57 +354,35 @@ class LaneFollower(object):
     ## Lane switching, with restrains in case there is a coming turn approaching
     ## if you already have a turn message, then the turn will wait until the
     ## the lines are straight again or there is lane in genral
-    print("DO Left", self.switch_left)
     # print("DO Right", self.switch_right)
-    print("signs", self.left_sign, self.right_sign)
-    print("objects", self.left_object, self.right_object)
+    # print("signs", self.left_sign, self.right_sign)
+    # print("objects", self.left_object, self.right_object)
 
-    
+    # print all the angles
+    print("left angle", self.left_angle, "right angle", self.right_angle, "far left angle", self.far_left_angle, "far right angle", self.far_right_angle)
     # Check either lane if it exist
-    if (not (self.left_lane_exist == False and self.right_lane_exist == False)):
-      # Make the turn to the left lane
-      if self.switch_left == True:
-          # print("switch_left")
-          if mean_far_left != None:
-              if self.straight_path == True:
-                  print("Turn Left: ")
-                  omega = self.lane_switcher(mean_left, mean_far_left, middle)
-          else:
-              if mean_far_right != None and self.far_left_angle == 0.0:
-                  if self.left_sign == False:
-                      # print("Turned")
-                      self.switch_left = False
-                      self.far_right_angle = 0.0
+    # print("left lane exist", self.left_lane_exist, "right lane exist", self.right_lane_exist)
+    print("DO Left", self.switch_left)
+    if self.switch_left == True:
+      if (not (self.left_lane_exist == False and self.right_lane_exist == False)):
+        print("straight path", self.straight_path)
+        if self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_left_angle == 0.0:
+            # Make the turn to the left lane
+            if self.left_lane_exist == True:
+                # if self.straight_path == True:
+                    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Turn Left: ")
+                    omega = self.calculate_omega(mean_far_left, mean_left, middle)
+            else:
+                if self.right_lane_exist == True:
+                    if self.left_sign == False:
+                        # print("Turned")
+                        self.switch_left = False
+                        self.far_right_angle = 0.0
 
       # Make the turn to the right lane
-      if self.switch_right == True:
-          # print("switch_right")
-          if mean_far_right != None:
-              if self.straight_path == True:
-                  print("Turn Right: ")
-                  omega = self.lane_switcher(mean_right, mean_far_right, middle)
-          else:
-              if mean_far_left != None and self.far_right_angle == 0.0:
-                  if self.right_sign == False:
-                      # print("Turned")
-                      self.switch_right = False
-                      self.far_left_angle = 0.0
 
 
-                    
-      
-
-
-
-
-
-
-    if omega:
-          self.old_omega = omega
-    else:
-          omega = self.old_omega
-
-          
+    
     # Send velocity
     self.send_velocity(omega)
 
