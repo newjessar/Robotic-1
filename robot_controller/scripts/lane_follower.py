@@ -249,17 +249,19 @@ class LaneFollower(object):
     error = width - centerLane
     kp = 0.01
     omega = 0
+    # print("Error: ", error)
+
 
     if self.forward_speed == 1.2:
       if error > 100 or error < -100:
           kp = 0.007
       else:
           kp = 0.01
-    elif self.forward_speed >= 0.7:
+    elif self.forward_speed == 0.7:
       if error > 100 or error < -100:
-        kp = 0.02
+          kp = 0.02
       else:
-        kp = 0.035
+          kp = 0.035
 
 
     omega = (self.forward_speed * kp) * error
@@ -270,6 +272,7 @@ class LaneFollower(object):
   def lane_switcher(self, mean, mean_far, width):
     # Check the conditions and preform the turn to the left
       if self.switch_left == True:
+        print(">>>>>>>>>>>>>>>>>>>>SWITCHING LEFT")
         if self.left_object == False and self.left_sign == False:
           if self.left_angle == 0.0 and self.far_left_angle == 0.0:
             if self.straight_path == True:
@@ -281,11 +284,12 @@ class LaneFollower(object):
     # Check the conditions and preform the turn to the right
       elif self.switch_right == True:
           if self.right_object == False and self.right_sign == False:
-            if self.straight_path == True:
-                  if mean_far != None and mean != None:
-                        print("HEREEEEEEEEEEEEEEEEEEEEEEEEE")
-                        omega = self.calculate_omega(mean, mean_far, width)
-                        return omega
+            if self.right_angle == 0.0 and self.far_right_angle == 0.0:
+                if self.straight_path == True:
+                      if mean_far != None and mean != None:
+                            print("HEREEEEEEEEEEEEEEEEEEEEEEEEE")
+                            omega = self.calculate_omega(mean, mean_far, width)
+                            return omega
 
 
 
@@ -357,38 +361,39 @@ class LaneFollower(object):
     ## Lane switching, with restrains in case there is a coming turn approaching
     ## if you already have a turn message, then the turn will wait until the
     ## the lines are straight again or there is lane in genral
-    print("DO YOU", self.switch_left)
-    self.left_sign = False
-    print("mean far riht", mean_far_left)
+    print("DO Left", self.switch_left)
+    # print("DO Right", self.switch_right)
+    print("signs", self.left_sign, self.right_sign)
+    print("objects", self.left_object, self.right_object)
 
+    
     # Check either lane if it exist
     if (not (self.left_lane_exist == False and self.right_lane_exist == False)):
       # Make the turn to the left lane
       if self.switch_left == True:
-          print("switch_left")
+          # print("switch_left")
           if mean_far_left != None:
               if self.straight_path == True:
                   print("Turn Left: ")
                   omega = self.lane_switcher(mean_left, mean_far_left, middle)
           else:
-              if mean_far_right != None and self.straight_path == True:
+              if mean_far_right != None and self.far_left_angle == 0.0:
                   if self.left_sign == False:
-                      print("Turned")
+                      # print("Turned")
                       self.switch_left = False
                       self.far_right_angle = 0.0
 
       # Make the turn to the right lane
       if self.switch_right == True:
-          print("switch_right")
+          # print("switch_right")
           if mean_far_right != None:
               if self.straight_path == True:
                   print("Turn Right: ")
                   omega = self.lane_switcher(mean_right, mean_far_right, middle)
           else:
-              print("                   mean far left", mean_far_left, "Path", self.straight_path)
-              if mean_far_left != None and self.straight_path == True:
+              if mean_far_left != None and self.far_right_angle == 0.0:
                   if self.right_sign == False:
-                      print("Turned")
+                      # print("Turned")
                       self.switch_right = False
                       self.far_left_angle = 0.0
 

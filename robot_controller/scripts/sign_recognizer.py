@@ -11,23 +11,23 @@ class SignRecognizer:
     def __init__(self, data_collection_mode = False, data_filename = None):
 
         self.labels = ["left", "right", "up", "square", "triangle", "smiley", "background"]
-        # # Data should be stored in /home/username/data/
-        # self.path = os.path.join(os.environ["HOME"], "data")
-        # self.ROI = None
-        # self.roi_classification_size = 28
-        # self.collectedROIs = []
-        # self.array_of_signs = []
+        # Data should be stored in /home/username/data/
+        self.path = os.path.join(os.environ["HOME"], "data")
+        self.ROI = None
+        self.roi_classification_size = 28
+        self.collectedROIs = []
+        self.array_of_signs = []
 
-        # self.collect = data_collection_mode
-        # self.data_filename = data_filename
+        self.collect = data_collection_mode
+        self.data_filename = data_filename
 
-        # if self.collect: # If collecting data, run save function on shutdown
-        #     rospy.on_shutdown(self.save_data)
-        # else: # Else load the network and run the predict function once
-        #     self.model = tf.keras.models.load_model(os.path.join(os.environ["HOME"] + "/network_model", "model_classifier.h5"))
-        #     # Run the network once since first time it is slow
-        #     fake_image = np.zeros((self.roi_classification_size, self.roi_classification_size, 3))
-        #     self.model.predict(np.asarray([fake_image]))
+        if self.collect: # If collecting data, run save function on shutdown
+            rospy.on_shutdown(self.save_data)
+        else: # Else load the network and run the predict function once
+            self.model = tf.keras.models.load_model(os.path.join(os.environ["HOME"] + "/network_model", "model_classifier.h5"))
+            # Run the network once since first time it is slow
+            fake_image = np.zeros((self.roi_classification_size, self.roi_classification_size, 3))
+            self.model.predict(np.asarray([fake_image]))
 
 
     def to_hsv(self, image):
