@@ -234,6 +234,7 @@ class LaneFollower(object):
   #     if error > 100 or error < -100:
   #       kp = 0.007
   #     else:
+          ## old kp 0.015
   #       kp = 0.035
   #   # else:
   #   #   # Exponential decay parameters
@@ -358,5 +359,7 @@ class LaneFollower(object):
         self.send_velocity(omega)
     
 
-
+## Situation where there is turn to the left by the left sign, 
+## then a sign UP jumps.
+## beside that tehre is a turn
    
