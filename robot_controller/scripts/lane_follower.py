@@ -257,34 +257,6 @@ class LaneFollower(object):
     omega = (self.forward_speed * kp) * error
 
     return omega
-    
-  # Lane switcher function
-  def lane_switcher(self, mean, mean_far, width):
-      print("straight: ", self.straight_path)  
-    # Check the conditions and preform the turn to the left
-      if self.switch_left == True:
-        print(">>>>>>>>>>>>>>>>>>>>SWITCHING LEFT")
-        if self.left_object == False and self.left_sign == False:
-          if self.left_angle == 0.0 and self.far_left_angle == 0.0:
-            print(">>>>>>>>>>>>>>>>>>>> Angles 0.0")
-            if self.straight_path == True:
-                  print("straight path")
-                  print("Means: ", mean_far, mean)
-                  if mean_far != None and mean != None:
-                        print("################################################Calculating omega")
-                        omega = self.calculate_omega(mean_far, mean, width)
-                        return omega
-                
-    # Check the conditions and preform the turn to the right
-      elif self.switch_right == True:
-          if self.right_object == False and self.right_sign == False:
-            if self.right_angle == 0.0 and self.far_right_angle == 0.0:
-                if self.straight_path == True:
-                      if mean_far != None and mean != None:
-                            print("HEREEEEEEEEEEEEEEEEEEEEEEEEE")
-                            omega = self.calculate_omega(mean, mean_far, width)
-                            return omega
-
 
 
   # Image callback function, gets called at 10Hz 
@@ -351,26 +323,12 @@ class LaneFollower(object):
     # check if right lane exist
     self.right_lane_exist = True if mean_far_right is not None else False
 
-    ## Lane switching, with restrains in case there is a coming turn approaching
-    ## if you already have a turn message, then the turn will wait until the
-    ## the lines are straight again or there is lane in genral
-    # print("DO Right", self.switch_right)
-    # print("signs", self.left_sign, self.right_sign)
-    # print("objects", self.left_object, self.right_object)
 
-    # print all the angles
-    print("left angle", self.left_angle, "right angle", self.right_angle, "far left angle", self.far_left_angle, "far right angle", self.far_right_angle)
     # Check either lane if it exist
-    # print("left lane exist", self.left_lane_exist, "right lane exist", self.right_lane_exist)
-    print("DO Left", self.switch_left)
     if self.switch_left == True:
       if (not (self.left_lane_exist == False and self.right_lane_exist == False)):
-        print("straight path", self.straight_path)
         if self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_left_angle == 0.0:
-            # Make the turn to the left lane
             if self.left_lane_exist == True:
-                # if self.straight_path == True:
-                    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Turn Left: ")
                     omega = self.calculate_omega(mean_far_left, mean_left, middle)
             else:
                 if self.right_lane_exist == True:
@@ -380,6 +338,18 @@ class LaneFollower(object):
                         self.far_right_angle = 0.0
 
       # Make the turn to the right lane
+    if self.switch_right == True:
+      if (not (self.left_lane_exist == False and self.right_lane_exist == False)):
+          if self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_right_angle == 0.0:
+            if self.right_lane_exist == True:
+                omega = self.calculate_omega(mean_right, mean_far_right, middle)
+            else:
+                if self.left_lane_exist == True:
+                    if self.right_sign == False:
+                        # print("Turned")
+                        self.switch_right = False
+                        self.far_left_angle = 0.0
+            
 
 
     
