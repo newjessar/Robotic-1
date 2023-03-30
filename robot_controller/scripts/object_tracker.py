@@ -24,6 +24,7 @@ class ObjectTracker(object):
         ### This issue can appear especially when the vehicle is taken a turn
         if clusters:
             for item in clusters:
+                print(item)
                 x, y = item
                 # object on front
                 if -0.1 <= y <= 0.1:
@@ -41,6 +42,11 @@ class ObjectTracker(object):
                 if -(self.lane_segment+self.lane_width) <= y <= -(self.lane_segment):
                     if not (-0.37 <= y <= -0.30):
                         self.lane_occupied["right_lane"] = True
+
+        
+
+                
+
 
 
           

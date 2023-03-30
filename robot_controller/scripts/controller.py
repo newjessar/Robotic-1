@@ -110,18 +110,16 @@ class Controller(object):
         self.lane_follower.right_sign = False
 
     elif self.turning_issue == 2:
-        # print("rightish")
         self.lane_follower.switch_right = True
         self.lane_follower.right_sign = True
         self.lane_follower.left_sign = False
 
     elif self.turning_issue == 3:
-        # print("stop")
         self.lane_follower.left_sign = False
         self.lane_follower.right_sign = False
 
 
-    
+    obj_direction = ["left_lane", "right_lane", "front", "back_left", "back_right"]
     # check if there are any objects in front, left or right of the robot
     if data:
         cluster = self.laser_data.cluster(data)
@@ -129,7 +127,7 @@ class Controller(object):
 
         # if object on the left lane
         if self.lane_follower.left_lane_exist:         
-          if self.object_tracker.lane_occupied["left_lane"]:
+          if self.object_tracker.lane_occupied[obj_direction[0]]:
               self.lane_follower.right_object = True
           else:
               self.lane_follower.right_object = False
@@ -137,14 +135,14 @@ class Controller(object):
 
         # if object on the right lane
         if self.lane_follower.right_lane_exist:   
-          if self.object_tracker.lane_occupied["right_lane"]:
+          if self.object_tracker.lane_occupied[obj_direction[1]]:
               self.lane_follower.right_object = True
           else:
               self.lane_follower.right_object = False
 
 
         # if object in front
-        if self.object_tracker.lane_occupied["front"]:
+        if self.object_tracker.lane_occupied[obj_direction[2]]:
           self.lane_follower.switch_left = True
           self.lane_follower.switch_right = True
           if (not self.lane_follower.left_lane_exist and not self.lane_follower.right_lane_exist) or (self.object_tracker.lane_occupied["left_lane"] or self.object_tracker.lane_occupied["right_lane"]) or (not self.lane_follower.straight_path):
@@ -158,6 +156,19 @@ class Controller(object):
 
               self.lane_follower.forward_speed = self.old_speed
               self.old_speed = 0.0   
+
+        # if object approaching from left south
+        if self.object_tracker.lane_occupied[obj_direction[3]]:
+              self.lane_follower.left_object = True
+        else:
+              self.lane_follower.right_object = False
+        
+        # if object approaching from right south
+        if self.object_tracker.lane_occupied[obj_direction[4]]:
+              self.lane_follower.right_object = True
+        else:
+              self.lane_follower.right_object = False
+
  
 
 
