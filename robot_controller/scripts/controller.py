@@ -15,7 +15,7 @@ class Controller(object):
     self.old_speed = 0.0
     
     # Change the parameter depending on if you are collecting data or using a trained network to predict. 
-    self.signs_recognizer = SignRecognizer(data_collection_mode = False, data_filename = "training")
+    # self.signs_recognizer = SignRecognizer(data_collection_mode = False, data_filename = "training")
     # self.signs_recognizer = SignRecognizer(data_collection_mode = True, data_filename = "training") 
     
     # It was a requiremnt to initialize sign_recognizer before other classes
@@ -72,58 +72,58 @@ class Controller(object):
   def signs_detection_callback(self):
       
       sign = None
-      sign = (self.signs_recognizer.classify(self.lane_follower.original_image))
-      if sign != None:
-          if self.last_sign != sign:
-              print(self.signs_recognizer.labels[sign-1])
-              self.last_sign = sign
+      # sign = (self.signs_recognizer.classify(self.lane_follower.original_image))
+      # if sign != None:
+      #     if self.last_sign != sign:
+      #         print(self.signs_recognizer.labels[sign-1])
+      #         self.last_sign = sign
           
           
-          if sign == 1:
-            self.turning_issue = sign
+      #     if sign == 1:
+      #       self.turning_issue = sign
 
-          elif sign == 2:
-            self.turning_issue = sign
+      #     elif sign == 2:
+      #       self.turning_issue = sign
 
-          elif sign == 3:
-            self.turning_issue = sign
+      #     elif sign == 3:
+      #       self.turning_issue = sign
 
-          elif sign == 4:
-            self.lane_follower.forward_speed = 0.7
+      #     elif sign == 4:
+      #       self.lane_follower.forward_speed = 0.7
 
-          elif sign == 5:
-            self.lane_follower.forward_speed = 1.2
+      #     elif sign == 5:
+      #       self.lane_follower.forward_speed = 1.2
 
 
   # Laser callback function, gets called at 10Hz
   def laser_callback(self, laser_msg):
+    pass
+    # # print("             turn left", self.lane_follower.switch_left)
+    # # print("                             turn right", self.lane_follower.switch_right)
 
-    # print("             turn left", self.lane_follower.switch_left)
-    # print("                             turn right", self.lane_follower.switch_right)
-
-    # print(self.last_sign)
-    # Get the laser data in cartesian coordinates
-    data = self.laser_data.convert_to_cartesian(laser_msg)
-    self.signs_detection_callback()
+    # # print(self.last_sign)
+    # # Get the laser data in cartesian coordinates
+    # data = self.laser_data.convert_to_cartesian(laser_msg)
+    # self.signs_detection_callback()
     
-    # check if there are any restrictions on turning
-    if self.turning_issue == 1:
-        # print("leftish")
-        self.lane_follower.switch_left = True
-        self.lane_follower.switch_right = False
+    # # check if there are any restrictions on turning
+    # if self.turning_issue == 1:
+    #     # print("leftish")
+    #     self.lane_follower.switch_left = True
+    #     self.lane_follower.switch_right = False
 
 
-    elif self.turning_issue == 2:
-        # print("rightish")
-        self.lane_follower.switch_right = True
-        self.lane_follower.switch_left = False
+    # elif self.turning_issue == 2:
+    #     # print("rightish")
+    #     self.lane_follower.switch_right = True
+    #     self.lane_follower.switch_left = False
 
         
     
-    elif self.turning_issue == 3:
-        # print("stop")
-        self.lane_follower.switch_right = False
-        self.lane_follower.switch_left = False
+    # elif self.turning_issue == 3:
+    #     # print("stop")
+    #     self.lane_follower.switch_right = False
+    #     self.lane_follower.switch_left = False
 
     
     # # check if there are any objects in front, left or right of the robot
