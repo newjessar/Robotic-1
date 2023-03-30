@@ -147,12 +147,8 @@ class SignRecognizer:
                 # print("label_idx", label_idx)
                 # print(self.labels[label_idx])
 
-
-
             # If self.collect == True
             # Append the ROI image to self.collectedROIs (it will be saved once the node closes)
-            # if roi_array and self.collect:    
-                # [self.collectedROIs.append(roi) for roi in roi_array]
             if roi_array and self.collect:
                 for item in roi_array:
                     self.collectedROIs.append(item)

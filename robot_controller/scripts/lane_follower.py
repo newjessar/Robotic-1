@@ -322,39 +322,41 @@ class LaneFollower(object):
     self.left_lane_exist = True if mean_far_left is not None else False
     # check if right lane exist
     self.right_lane_exist = True if mean_far_right is not None else False
+    
+    # Comunicate with the trafic signs
+    if self.left_sign == True: self.switch_right = False
+    if self.right_sign == True: self.switch_left = False
 
 
     # Check either lane if it exist
     if self.switch_left == True:
       if (not (self.left_lane_exist == False and self.right_lane_exist == False)):
-        if self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_left_angle == 0.0:
+        if self.right_sign == False and self.left_object == False:
+          if self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_left_angle == 0.0:
             if self.left_lane_exist == True:
-                    omega = self.calculate_omega(mean_far_left, mean_left, middle)
+                omega = self.calculate_omega(mean_far_left, mean_left, middle)
             else:
                 if self.right_lane_exist == True:
-                    if self.left_sign == False:
-                        # print("Turned")
-                        self.switch_left = False
-                        self.far_right_angle = 0.0
+                    if self.left_sign == False: self.switch_left = False
+                    self.far_right_angle = 0.0
 
       # Make the turn to the right lane
     if self.switch_right == True:
       if (not (self.left_lane_exist == False and self.right_lane_exist == False)):
+        if self.left_sign == False and self.right_object == False:
           if self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_right_angle == 0.0:
             if self.right_lane_exist == True:
                 omega = self.calculate_omega(mean_right, mean_far_right, middle)
             else:
                 if self.left_lane_exist == True:
-                    if self.right_sign == False:
-                        # print("Turned")
-                        self.switch_right = False
-                        self.far_left_angle = 0.0
+                    if self.right_sign == False: self.switch_right = False
+                    self.far_left_angle = 0.0
             
 
-
-    
     # Send velocity
-    self.send_velocity(omega)
+    if not rospy.is_shutdown():
+        self.send_velocity(omega)
+    
 
 
    

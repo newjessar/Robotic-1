@@ -17,12 +17,12 @@ def add_sign(sign_name, position):
 # Available sign names 
 sign_names = ["left_arrow", "right_arrow", "up_arrow", "triangle", "square", "smiley"] 
 
-#     0        go to left lane             4        
-#     1        go to right lane            4   
-#     2        both lanes are allowed      3   
-#     3        slow down = 0.7 m/s         4   
-#     4        speed up = 1.2 m/s          3   
-#     5        Smile, you are on camera    3    
+#     0        go to left lane                    
+#     1        go to right lane             
+#     2        both lanes are allowed        
+#     3        slow down = 0.7 m/s           
+#     4        speed up = 1.2 m/s          
+#     5        Smile, you are on camera      
 
 # Add the sign "up arrow" and location 0
 add_sign(sign_names[1], 1)           
@@ -31,7 +31,7 @@ add_sign(sign_names[5], 17)
 add_sign(sign_names[1], 18)          
 add_sign(sign_names[0], 21)           
 add_sign(sign_names[2], 22)           
-add_sign(sign_names[0], 24)           
+add_sign(sign_names[1], 24)           
 add_sign(sign_names[0], 27)           
 add_sign(sign_names[4], 28)           
 add_sign(sign_names[1], 30)           
