@@ -18,9 +18,9 @@ def run_launch_file(bot_name, position):
 
 ## Add bot to spawn here via run_launch_file (bot_name, position)
 run_launch_file("bot1", 0)
-run_launch_file("bot3", 3)
+run_launch_file("bot3", 13)
 run_launch_file("bot4", 7)
-run_launch_file("bot6", 10)
+run_launch_file("bot6", 11)
 
 
 

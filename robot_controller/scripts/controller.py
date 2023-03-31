@@ -10,7 +10,7 @@ from bot_message.srv import SetSpeed, SetSpeedResponse
 class Controller(object):
 
   def __init__(self):
-    self.forward_speed = 0.7 # Set the starting forward speed, DO NOT CHANGE
+    self.forward_speed = 0.0 # Set the starting forward speed, DO NOT CHANGE
     # temprery speed for the lane follower
     self.old_speed = 0.0
     
