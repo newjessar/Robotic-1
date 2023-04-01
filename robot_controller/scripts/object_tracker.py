@@ -46,6 +46,7 @@ class ObjectTracker(object):
                 # object on the back-right
                 if (-2.5 <= x <= 0) and (-0.25 < y < 0.25):
                     self.lane_occupied["back"] = True
+                    print("back object")
 
 
 
