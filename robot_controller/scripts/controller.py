@@ -119,7 +119,7 @@ class Controller(object):
         self.lane_follower.right_sign = False
 
 
-    obj_direction = ["left_lane", "right_lane", "front", "back_left", "back_right"]
+    obj_direction = ["left_lane", "right_lane", "front", "back"]
     # check if there are any objects in front, left or right of the robot
     if data:
         cluster = self.laser_data.cluster(data)
@@ -128,9 +128,9 @@ class Controller(object):
         # if object on the left lane
         if self.lane_follower.left_lane_exist:         
           if self.object_tracker.lane_occupied[obj_direction[0]]:
-              self.lane_follower.right_object = True
+              self.lane_follower.left_object = True
           else:
-              self.lane_follower.right_object = False
+              self.lane_follower.left_object = False
 
 
         # if object on the right lane
@@ -157,17 +157,11 @@ class Controller(object):
               self.lane_follower.forward_speed = self.old_speed
               self.old_speed = 0.0   
 
-        # if object approaching from left south
+        # if object approaching from back
         if self.object_tracker.lane_occupied[obj_direction[3]]:
-              self.lane_follower.left_object = True
-        else:
-              self.lane_follower.right_object = False
+              print("back object")
         
-        # if object approaching from right south
-        if self.object_tracker.lane_occupied[obj_direction[4]]:
-              self.lane_follower.right_object = True
-        else:
-              self.lane_follower.right_object = False
+
 
  
 
