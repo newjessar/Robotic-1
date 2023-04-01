@@ -67,6 +67,14 @@ class Controller(object):
 
     return EmptyResponse()
   
+  # estmate the speed of the bot when it is detected in front of me
+  def estimate_speed(self, distance):
+        # my speed
+        speed = self.lane_follower.forward_speed
+        if self.object_tracker.lane_occupied["front"]:
+              
+              
+  
 
   # call the sign recognizer callback function
   def signs_detection_callback(self):
@@ -119,7 +127,7 @@ class Controller(object):
         self.lane_follower.right_sign = False
 
 
-    obj_direction = ["left_lane", "right_lane", "front", "back"]
+    obj_direction = ["left_lane", "right_lane", "front", "back", "front_buffer"]
     # check if there are any objects in front, left or right of the robot
     if data:
         cluster = self.laser_data.cluster(data)
@@ -152,7 +160,7 @@ class Controller(object):
                   self.lane_follower.forward_speed = 0.7   
         else:
            # nothing in front
-           if self.lane_follower.switch_left == False and self.lane_follower.switch_right == False and self.old_speed != 0.0:
+           if self.object_tracker.lane_occupied["front_buffer"] and self.lane_follower.switch_left == False and self.lane_follower.switch_right == False and self.old_speed != 0.0:
 
               self.lane_follower.forward_speed = self.old_speed
               self.old_speed = 0.0   
@@ -163,9 +171,6 @@ class Controller(object):
         
 
 
- 
-
-
    
 if __name__ == "__main__":
       rospy.init_node("controller")
@@ -174,17 +179,7 @@ if __name__ == "__main__":
 
 
 
-    # lane_follower: Call back
+    # front-buffer
+    # required implemntation
     # --------------------------
-    # switch is True
-    # Check if the far_line is not None
-    # Check if all lines are is straight for 10 frames
-    #
-    # lane_follower: lane_switching
-    # --------------------------
-    # check if the left angle and the far_angle is 0.0 
-    #           (check to assure omega will not be altered during the turn)
-    # check if the mean_far and mean is not None 
-  #             (A check related to extended switching time in case no straight line is detected)
-    # check if its on hold
-    # centerLane = !!!!!!!!!!(mean_left+mean_right)/2!!!!!!!!!! doiuble check this
+    # estmate speed of the object
