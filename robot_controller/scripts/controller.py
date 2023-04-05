@@ -6,11 +6,12 @@ from object_tracker import ObjectTracker
 from sign_recognizer import SignRecognizer
 from std_srvs.srv import Empty, EmptyResponse
 from bot_message.srv import SetSpeed, SetSpeedResponse
+import time 
 
 class Controller(object):
 
   def __init__(self):
-    self.forward_speed = 0.0 # Set the starting forward speed, DO NOT CHANGE
+    self.forward_speed = 0.7 # Set the starting forward speed, DO NOT CHANGE
     # temprery speed for the lane follower
     self.old_speed = 0.0
     
@@ -28,6 +29,10 @@ class Controller(object):
     self.set_speed_service = rospy.Service("/set_speed", SetSpeed, self.set_speed_callback)
     self.last_sign = None
     self.turning_issue = 0
+
+    self.initial_distance = None
+    self.scan_counter = 0
+    self.scan_frequency = 20
 
 
   # Command via terminal to call this function: rosservice call /set_speed "speed: 0.0"
@@ -68,11 +73,30 @@ class Controller(object):
     return EmptyResponse()
   
   # estmate the speed of the bot when it is detected in front of me
-  def estimate_speed(self, distance):
-        # my speed
-        speed = self.lane_follower.forward_speed
-        if self.object_tracker.lane_occupied["front"]:
-              
+
+  def estimate_speed(self):
+      # distance to the object in front of me
+      distance = self.object_tracker.front_distance
+      if self.object_tracker.lane_occupied["front"]:
+          print("here")
+          if self.initial_distance is None:
+              self.initial_distance = distance
+              self.start_time = time.time()
+          else:
+              current_time = time.time()
+              time_interval = current_time - self.start_time
+              distance_change = self.initial_distance - distance
+              object_speed = distance_change / time_interval
+
+              print("Estimated object speed: ", object_speed)
+
+              # Reset the initial distance and start time for the next speed estimation
+              self.initial_distance = distance
+              self.start_time = current_time
+      else:
+          self.initial_distance = None
+          self.start_time = None
+
               
   
 
@@ -109,6 +133,7 @@ class Controller(object):
     # Get the laser data in cartesian coordinates
     data = self.laser_data.convert_to_cartesian(laser_msg)
     self.signs_detection_callback()
+    self.estimate_speed()
     
     # check if there are any restrictions on turning
     if self.turning_issue == 1:
@@ -151,8 +176,8 @@ class Controller(object):
 
         # if object in front
         if self.object_tracker.lane_occupied[obj_direction[2]]:
-          self.lane_follower.switch_left = True
-          self.lane_follower.switch_right = True
+          # self.lane_follower.switch_left = True
+          # self.lane_follower.switch_right = True
           if (not self.lane_follower.left_lane_exist and not self.lane_follower.right_lane_exist) or (self.object_tracker.lane_occupied["left_lane"] or self.object_tracker.lane_occupied["right_lane"]) or (not self.lane_follower.straight_path):
               
               if self.old_speed == 0.0:
