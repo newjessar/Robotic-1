@@ -137,17 +137,12 @@ class SignRecognizer:
             processed_mask = self.post_process(mask)
             # Get the largest ROI from the list of ROIs
             roi_array = self.get_rois(processed_mask, image)
-            # print ("ROI LIST", roi_array)
 
 
             if roi_array and not self.collect:
                 label_images = self.predict(roi_array)
                 label_idx = np.argmax(label_images)
-                # print the sign 
-                # print("label_idx", label_idx)
-                # print(self.labels[label_idx])
 
-            # If self.collect == True
             # Append the ROI image to self.collectedROIs (it will be saved once the node closes)
             if roi_array and self.collect:
                 for item in roi_array:

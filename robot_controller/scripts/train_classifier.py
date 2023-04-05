@@ -23,7 +23,6 @@ h_filter = 3
 
 train_x_data = np.load(os.environ["HOME"] + "/data/train_classifier.npy").astype(np.float32) / 255
 train_y_data = np.load(os.environ["HOME"] + "/data/label_classifier.npy").astype(np.int32)
-print(train_y_data)
 
 # Create a model 
 

@@ -40,24 +40,23 @@ class ObjectTracker(object):
                 # # object on front within 2.0 meters
                 if (0.0 <= x <= 2.0) and (-0.25 < y < 0.25):
                     self.lane_occupied["front"] = True
-                    # self.front_distance = self.distance([0, 0], [x, y])
                     if (0.0 <= x <= 1.0):
                         self.lane_occupied["front_buffer"] = True
              
 
-                # # object on the right
-                # if (-2.5 <= x <= 2.5) and (-0.25 > y > -0.75):
-                #     self.lane_occupied["right_lane"] = True
+                # object on the right
+                if (-2.5 <= x <= 2.5) and (-0.25 > y > -0.75):
+                    self.lane_occupied["right_lane"] = True
 
-                # # object on the left
-                # if (-2.5 <= x <= 2.5) and (0.25 < y < 0.75):
-                #     self.lane_occupied["left_lane"] = True
+                # object on the left
+                if (-2.5 <= x <= 2.5) and (0.25 < y < 0.75):
+                    self.lane_occupied["left_lane"] = True
 
 
-                # # object on the back-right
-                # if (-2.5 <= x <= 0.5) and (-0.25 < y < 0.25):
-                #     self.lane_occupied["back"] = True
-                #     print("back object")
+                # object on the back-right
+                if (-2.5 <= x <= 0.5) and (-0.25 < y < 0.25):
+                    self.lane_occupied["back"] = True
+                    print("back object")
 
 
 

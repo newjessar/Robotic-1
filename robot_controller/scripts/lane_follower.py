@@ -186,11 +186,11 @@ class LaneFollower(object):
   # Function to send the velocity to the robot
   def send_velocity(self, omega): 
 
-    # omega = min(max(omega, -0.5), 0.5)
-    if omega > 0.5:
-        omega = 0.5
-    elif omega < -0.5:
-        omega = -0.5
+    omega = min(max(omega, -0.5), 0.5)
+    # if omega > 0.5:
+    #     omega = 0.5
+    # elif omega < -0.5:
+    #     omega = -0.5
 
     msg = Twist()
     msg.linear.x = self.forward_speed
@@ -254,7 +254,7 @@ class LaneFollower(object):
 
     centerLane = (mean_left+mean_right)/2
     error = width - centerLane
-    kp = 0.008
+    kp = 0.01
     omega = (self.forward_speed * kp) * error
 
     return omega
@@ -333,25 +333,29 @@ class LaneFollower(object):
     if self.switch_left == True:
       if (not (self.left_lane_exist == False and self.right_lane_exist == False)):
         if self.right_sign == False and self.left_object == False:
-          if self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_left_angle == 0.0:
+          if self.left_angle == 0.0 and self.right_angle == 0.0:
             if self.left_lane_exist == True:
-                omega = self.calculate_omega(mean_far_left, mean_left, middle)
+                omega = self.calculate_omega(mean_left, mean_far_left, middle)
             else:
                 if self.right_lane_exist == True:
-                    if self.left_sign == False: self.switch_left = False
-                    self.far_right_angle = 0.0
+                    omega = self.calculate_omega(mean_left, mean_right, middle)
+                    if self.left_sign == False: 
+                      self.switch_left = False
+                      self.far_right_angle = 0.0
 
       # Make the turn to the right lane
     if self.switch_right == True:
       if (not (self.left_lane_exist == False and self.right_lane_exist == False)):
-        if self.left_sign == False and self.right_object == False:
-          if self.left_angle == 0.0 and self.right_angle == 0.0 and self.far_right_angle == 0.0:
+        # if self.left_sign == False and self.right_object == False:
+          if self.left_angle == 0.0 and self.right_angle == 0.0:
             if self.right_lane_exist == True:
                 omega = self.calculate_omega(mean_right, mean_far_right, middle)
             else:
                 if self.left_lane_exist == True:
-                    if self.right_sign == False: self.switch_right = False
-                    self.far_left_angle = 0.0
+                    omega = self.calculate_omega(mean_left, mean_right, middle)
+                    if self.right_sign == False: 
+                      self.switch_right = False
+                      self.far_left_angle = 0.0
             
 
     # Send velocity
