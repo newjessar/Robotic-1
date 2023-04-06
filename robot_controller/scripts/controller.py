@@ -115,7 +115,7 @@ class Controller(object):
         self.lane_follower.right_sign = False
 
 
-    obj_direction = ["left_lane", "right_lane", "front"]
+    obj_direction = ["left_lane", "right_lane", "front", "front_turn"]
     # check if there are any objects in front, left or right of the robot
     if data:
         cluster = self.laser_data.cluster(data)
@@ -136,11 +136,12 @@ class Controller(object):
 
           if self.object_tracker.lane_occupied[obj_direction[1]] == False:
               self.lane_follower.right_object = False
+              
 
-
+        # print("front object: ", self.object_tracker.lane_occupied[obj_direction[2]], "front Turn", self.object_tracker.lane_occupied[obj_direction[3]], "old speed: ", self.old_speed, "switch left: ", self.lane_follower.switch_left, "switch right: ", self.lane_follower.switch_right)
         # if object in front
         if self.object_tracker.lane_occupied[obj_direction[2]] == True:
-          print("~~~~~~~~~object in front")
+
           self.lane_follower.switch_left = True
           self.lane_follower.switch_right = True
           if (not self.lane_follower.left_lane_exist and not self.lane_follower.right_lane_exist) or (self.object_tracker.lane_occupied["left_lane"] or self.object_tracker.lane_occupied["right_lane"]) or (not self.lane_follower.straight_path):
@@ -148,14 +149,31 @@ class Controller(object):
                   self.old_speed = self.lane_follower.forward_speed
                   self.lane_follower.forward_speed = 0.7   
                   self.object_restrection = True
-                  print("+++++++++++++++object restrection")
-        if self.object_tracker.lane_occupied[obj_direction[2]] == False:
+        
+
+        # In case there is an object in front and the robot is turning
+        if self.lane_follower.straight_path == False and self.object_tracker.lane_occupied[obj_direction[3]] == True:
+          self.lane_follower.switch_left = True
+          self.lane_follower.switch_right = True
+          if self.old_speed == 0.0:
+              self.old_speed = self.lane_follower.forward_speed
+              self.lane_follower.forward_speed = 0.7   
+              self.object_restrection = True
+
+    if self.object_tracker.lane_occupied[obj_direction[2]] == False:
            # nothing in front
-           if self.lane_follower.switch_left == False and self.lane_follower.switch_right == False and self.old_speed != 0.0:
-              self.lane_follower.forward_speed = self.old_speed
-              self.old_speed = 0.0   
-              self.object_restrection = False
-              print("-----------------------object restrection off")
+          if self.lane_follower.switch_left == False and self.lane_follower.switch_right == False and self.old_speed != 0.0:
+            self.lane_follower.forward_speed = self.old_speed
+            self.old_speed = 0.0   
+            self.object_restrection = False          
+
+    if self.lane_follower.straight_path == True and self.object_tracker.lane_occupied[obj_direction[3]] == False:
+      if self.lane_follower.switch_left == False and self.lane_follower.switch_right == False and self.old_speed != 0.0:
+          # print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ FUC ME SWITCH")
+          self.lane_follower.forward_speed = self.old_speed
+          self.old_speed = 0.0   
+          self.object_restrection = False
+             
 
 
 

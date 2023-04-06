@@ -11,6 +11,7 @@ class ObjectTracker(object):
         self.lane_occupied["left_lane"] = False
         self.lane_occupied["right_lane"] = False
         self.lane_occupied["front"] = False
+        self.lane_occupied["front_turn"] = False
 
 
     # tracking objects, take the cluster means as input and return the lane occupied
@@ -20,15 +21,22 @@ class ObjectTracker(object):
         self.lane_occupied["left_lane"] = False
         self.lane_occupied["right_lane"] = False
         self.lane_occupied["front"] = False
+        self.lane_occupied["front_turn"] = False
 
     
         if clusters:
             for item in clusters:
                 x, y = item
+                # print("x: ", x, "y: ", y)
                 # # object on front within 2.0 meters
                 if (0.0 <= x <= 2.0) and (-0.25 < y < 0.25):
-                    print("object in front")
+                    # print("object in front")
                     self.lane_occupied["front"] = True
+
+                if (0.0 <= x <= 2.0):
+                    if ((-0.375 < y < -0.25) or (0.375 > y > 0.25)):
+                        # print("object turn in front")
+                        self.lane_occupied["front_turn"] = True
              
                 # object on the right
                 if (-2.5 <= x <= 2.5) and (-0.25 > y > -0.75):
