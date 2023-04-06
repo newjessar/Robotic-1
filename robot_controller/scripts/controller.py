@@ -29,10 +29,8 @@ class Controller(object):
     self.set_speed_service = rospy.Service("/set_speed", SetSpeed, self.set_speed_callback)
     self.last_sign = None
     self.turning_issue = 0
+    self.object_restrection = False
 
-    self.initial_distance = None
-    self.scan_counter = 0
-    self.scan_frequency = 20
 
 
   # Command via terminal to call this function: rosservice call /set_speed "speed: 0.0"
@@ -58,47 +56,15 @@ class Controller(object):
   
   # Command via terminal to call this function: rosservice call /switch_left
   def initiate_switch_left(self, empty_msg):
-    # Check line angles to see if you can switch lanes
-    # Start the lane switching
     self.lane_follower.switch_left = True
 
     return EmptyResponse()
   
   # Command via terminal to call this function: rosservice call /switch_right
   def initiate_switch_right(self, empty_msg):
-    # Check line angles to see if you can switch lanes
-    # Start the lane switching
     self.lane_follower.switch_right = True
 
     return EmptyResponse()
-  
-  # estmate the speed of the bot when it is detected in front of me
-
-  def estimate_speed(self):
-      # distance to the object in front of me
-      distance = self.object_tracker.front_distance
-      if self.object_tracker.lane_occupied["front"]:
-          print("here")
-          if self.initial_distance is None:
-              self.initial_distance = distance
-              self.start_time = time.time()
-          else:
-              current_time = time.time()
-              time_interval = current_time - self.start_time
-              distance_change = self.initial_distance - distance
-              object_speed = distance_change / time_interval
-
-              print("Estimated object speed: ", object_speed)
-
-              # Reset the initial distance and start time for the next speed estimation
-              self.initial_distance = distance
-              self.start_time = current_time
-      else:
-          self.initial_distance = None
-          self.start_time = None
-
-              
-  
 
   # call the sign recognizer callback function
   def signs_detection_callback(self):
@@ -110,7 +76,6 @@ class Controller(object):
               print(self.signs_recognizer.labels[sign-1])
               self.last_sign = sign
           
-          
           if sign == 1:
             self.turning_issue = sign
 
@@ -120,10 +85,10 @@ class Controller(object):
           elif sign == 3:
             self.turning_issue = sign
 
-          elif sign == 4:
+          elif sign == 4 and self.object_restrection == False:
             self.lane_follower.forward_speed = 0.7
 
-          elif sign == 5:
+          elif sign == 5 and self.object_restrection == False:
             self.lane_follower.forward_speed = 1.2
 
 
@@ -133,11 +98,9 @@ class Controller(object):
     # Get the laser data in cartesian coordinates
     data = self.laser_data.convert_to_cartesian(laser_msg)
     self.signs_detection_callback()
-    self.estimate_speed()
     
     # check if there are any restrictions on turning
     if self.turning_issue == 1:
-        # print("leftish")
         self.lane_follower.switch_left = True
         self.lane_follower.left_sign = True
         self.lane_follower.right_sign = False
@@ -152,7 +115,7 @@ class Controller(object):
         self.lane_follower.right_sign = False
 
 
-    obj_direction = ["left_lane", "right_lane", "front", "back", "front_buffer"]
+    obj_direction = ["left_lane", "right_lane", "front"]
     # check if there are any objects in front, left or right of the robot
     if data:
         cluster = self.laser_data.cluster(data)
@@ -160,39 +123,42 @@ class Controller(object):
 
         # if object on the left lane
         if self.lane_follower.left_lane_exist:         
-          if self.object_tracker.lane_occupied[obj_direction[0]]:
+          if self.object_tracker.lane_occupied[obj_direction[0]] == True:
               self.lane_follower.left_object = True
-          else:
+          if self.object_tracker.lane_occupied[obj_direction[0]] == False:
               self.lane_follower.left_object = False
 
 
         # if object on the right lane
         if self.lane_follower.right_lane_exist:   
-          if self.object_tracker.lane_occupied[obj_direction[1]]:
+          if self.object_tracker.lane_occupied[obj_direction[1]] == True:
               self.lane_follower.right_object = True
-          else:
+
+          if self.object_tracker.lane_occupied[obj_direction[1]] == False:
               self.lane_follower.right_object = False
 
 
         # if object in front
-        if self.object_tracker.lane_occupied[obj_direction[2]]:
-          # self.lane_follower.switch_left = True
-          # self.lane_follower.switch_right = True
+        if self.object_tracker.lane_occupied[obj_direction[2]] == True:
+          print("~~~~~~~~~object in front")
+          self.lane_follower.switch_left = True
+          self.lane_follower.switch_right = True
           if (not self.lane_follower.left_lane_exist and not self.lane_follower.right_lane_exist) or (self.object_tracker.lane_occupied["left_lane"] or self.object_tracker.lane_occupied["right_lane"]) or (not self.lane_follower.straight_path):
-              
               if self.old_speed == 0.0:
                   self.old_speed = self.lane_follower.forward_speed
                   self.lane_follower.forward_speed = 0.7   
-        else:
+                  self.object_restrection = True
+                  print("+++++++++++++++object restrection")
+        if self.object_tracker.lane_occupied[obj_direction[2]] == False:
            # nothing in front
-           if self.object_tracker.lane_occupied["front_buffer"] and self.lane_follower.switch_left == False and self.lane_follower.switch_right == False and self.old_speed != 0.0:
-
+           if self.lane_follower.switch_left == False and self.lane_follower.switch_right == False and self.old_speed != 0.0:
               self.lane_follower.forward_speed = self.old_speed
               self.old_speed = 0.0   
+              self.object_restrection = False
+              print("-----------------------object restrection off")
 
-        # if object approaching from back
-        if self.object_tracker.lane_occupied[obj_direction[3]]:
-              print("back object")
+
+
         
 
 
@@ -203,8 +169,3 @@ if __name__ == "__main__":
       rospy.spin()
 
 
-
-    # front-buffer
-    # required implemntation
-    # --------------------------
-    # estmate speed of the object

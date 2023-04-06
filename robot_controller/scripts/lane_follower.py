@@ -88,7 +88,7 @@ class LaneFollower(object):
     # Find all the lines using cv2.HoughLinesP function
     # lines = np.asarray(cv2.HoughLinesP(binary_mask, 0.3, np.pi/180, 70, 100, 5))
 
-    # Assuming 'image' is your grayscale input image
+    # # Assuming 'image' is your grayscale input image
     lsd = cv2.createLineSegmentDetector(0)
     detected_lines, width, prec, nfa = lsd.detect(binary_mask)
 
@@ -98,7 +98,10 @@ class LaneFollower(object):
     ## Remove the extra dimension from the lines array
     lines = np.squeeze(lines)
 
-    ## Itteration over the lines to get the far_left, left, right, far_right lines
+    # lines = cv2.HoughLinesP(binary_mask,1,np.pi/180, 10)
+    # lines = np.asarray(lines)
+    # lines = np.squeeze(lines)
+    # ## Itteration over the lines to get the far_left, left, right, far_right lines
     if lines.any():
         # Calculate the average x values for each line
         x_axis = np.mean(lines[:, [0, 2]], axis=1)
@@ -117,30 +120,17 @@ class LaneFollower(object):
 
     return np.asarray(far_left), np.asarray(left), np.asarray(right), np.asarray(far_right)
   
-    
-  ## Ge the highest and lowest x and y values for a given line
-  def get_straight_Line(self, line):
-    if line.size > 0:
-      # Calculate the sum of x1 and x2 for each line
-      x_sums = line[:, 0] + line[:, 2]
-      max_line = line[np.argmax(x_sums)]
-
-      return max_line
-
+  
   ## Get the angle for a given line
   def get_perLine_angle(self, line):
-      threshold = 1
       if line.size > 0:
-            if abs(abs(line[0]) - abs(line[2])) == threshold:
-                mean_x = abs((abs(line[0]) + abs(line[2])) / 2)
-                angle = atan2(mean_x - mean_x, abs(line[1]) - abs(line[3]))
-            else:
-                angle = atan2(abs(line[0]) - abs(line[2]), abs(line[1]) - abs(line[3]))
-                
-            if abs(angle) < 0.09:
-                return 0.0
-            else:
-              return angle
+          max_line = np.max(line, axis = 0)
+          min_line = np.min(line, axis = 0)
+          angle = atan2(abs(max_line[0] - min_line[0]), abs(max_line[1] - min_line[1]))
+          
+          if angle <= 0.10: angle = 0.0
+
+          return angle
 
   # Get the angle for each line
   def get_angles(self, far_left, left, right, far_right):
@@ -148,21 +138,21 @@ class LaneFollower(object):
     is_turn = True
 
     if left.size > 0:
-          l_angle = self.get_perLine_angle(self.get_straight_Line(left))
+          l_angle = self.get_perLine_angle(left)
           self.left_angle = l_angle
           is_turn = is_turn and (self.left_angle == 0.0)
     else:
           self.left_angle = 0.0
     
     if right.size > 0:
-          r_angle = self.get_perLine_angle(self.get_straight_Line(right))
+          r_angle = self.get_perLine_angle(right)
           self.right_angle = r_angle
           is_turn = is_turn and (self.right_angle == 0.0)            
     else:
           self.right_angle = 0.0
     
     if far_left.size > 0:
-          fl_angle = self.get_perLine_angle(self.get_straight_Line(far_left))
+          fl_angle = self.get_perLine_angle(far_left)
           self.far_left_angle = fl_angle
           is_turn = is_turn and (self.far_left_angle == 0.0)
     else:
@@ -170,7 +160,7 @@ class LaneFollower(object):
 
     if far_right.size > 0:
           
-          fr_angle = self.get_perLine_angle(self.get_straight_Line(far_right))
+          fr_angle = self.get_perLine_angle(far_right)
           self.far_right_angle = fr_angle
           is_turn = is_turn and (self.far_right_angle == 0.0)  
     else:
@@ -187,11 +177,6 @@ class LaneFollower(object):
   def send_velocity(self, omega): 
 
     omega = min(max(omega, -0.5), 0.5)
-    # if omega > 0.5:
-    #     omega = 0.5
-    # elif omega < -0.5:
-    #     omega = -0.5
-
     msg = Twist()
     msg.linear.x = self.forward_speed
     msg.angular.z = omega
@@ -216,48 +201,14 @@ class LaneFollower(object):
 
 
 
-  # # Calculate the rotational velocity
-  # # width of the lane, mean left line, and mean right line
-  # def calculate_omega(self, mean_left, mean_right, width):
-    
-  #   centerLane = (mean_left+mean_right)/2
-  #   error = width - centerLane
-  #   kp = 0.01
-  #   omega = 0
-
-  #   if self.forward_speed == 1.2:
-  #     if error > 100 or error < -100:
-  #         kp = 0.007
-  #     else:
-  #         kp = 0.01
-  #   elif self.forward_speed >= 0.7:
-  #     if error > 100 or error < -100:
-  #       kp = 0.007
-  #     else:
-          ## old kp 0.015
-  #       kp = 0.035
-  #   # else:
-  #   #   # Exponential decay parameters
-  #   #   C = 0.033  # initial kp value
-  #   #   D = 0.01  # decay rate
-  #   #   # Calculate the dynamic kp value based on the error 
-  #   #   kp = C * np.exp(-D * abs(error))
-
-  #   omega = (self.forward_speed * kp) * error
-  #   return omega
-    
-
-
-
   # Calculate the rotational velocity
   def calculate_omega(self, mean_left, mean_right, width):
 
     centerLane = (mean_left+mean_right)/2
     error = width - centerLane
-    kp = 0.01
-    omega = (self.forward_speed * kp) * error
+    kp = 0.008
 
-    return omega
+    return (self.forward_speed * kp) * error
 
 
   # Image callback function, gets called at 10Hz 
@@ -287,23 +238,23 @@ class LaneFollower(object):
     ######################## Section is related to drawing the lines and the image #############################
     ############################################################################################################
     ## Make a copy of the warped image to draw the lines on
-    warped_image_copy = warped_image.copy()
+    # warped_image_copy = warped_image.copy()
           
-    # draw the lines on the warped image copy
+    # # draw the lines on the warped image copy
     # non_empty_lines = [arr for arr in [far_left, left, right, far_right] if arr.any()]
     # concatenated_lines = np.concatenate(non_empty_lines) if non_empty_lines else np.array([])
 
-    # Iterate through the concatenated array and draw lines
+    # # Iterate through the concatenated array and draw lines
     # for line in concatenated_lines: self.draw_line(warped_image_copy, line)
 
-    ## showing the warped image
+    # # showing the warped image
     # self.show_image("warped_image_copy", warped_image_copy)
     ############################################################################################################
     # Determine the angles of each line
     self.get_angles(far_left, left, right, far_right)
 
     ## Determine the mean x value for the left, right, far_left and far_right line 
-    mean_left, mean_right, mean_far_left, mean_far_right = None, None, None, None
+    mean_left, mean_right, mean_far_left, mean_far_right = 0.0, 0.0, 0.0, 0.0
     if left.any():
         mean_left = np.mean((left[:, 0] + left[:, 2]) / 2)
     if right.any():
@@ -318,52 +269,41 @@ class LaneFollower(object):
     omega = self.calculate_omega(mean_left, mean_right, middle)
 
     # check if a straight path is detected
-    self.straight_path = True if self.straight_line_count >= 10 else False
+    self.straight_path = True if self.straight_line_count >= 1 else False
     # check if left lane exist
-    self.left_lane_exist = True if mean_far_left is not None else False
+    self.left_lane_exist = True if mean_far_left != 0.0 else False
     # check if right lane exist
-    self.right_lane_exist = True if mean_far_right is not None else False
+    self.right_lane_exist = True if mean_far_right != 0.0 else False
     
-    # Comunicate with the trafic signs
+    # Comunicate with the trafic signs to chooose therecent 
     if self.left_sign == True: self.switch_right = False
     if self.right_sign == True: self.switch_left = False
 
-
-    # Check either lane if it exist
+    # In case there is a switch to the left
     if self.switch_left == True:
-      if (not (self.left_lane_exist == False and self.right_lane_exist == False)):
         if self.right_sign == False and self.left_object == False:
-          if self.left_angle == 0.0 and self.right_angle == 0.0:
-            if self.left_lane_exist == True:
+          if self.straight_path:
+            if far_left.any():
                 omega = self.calculate_omega(mean_left, mean_far_left, middle)
             else:
-                if self.right_lane_exist == True:
-                    omega = self.calculate_omega(mean_left, mean_right, middle)
-                    if self.left_sign == False: 
-                      self.switch_left = False
-                      self.far_right_angle = 0.0
+                if self.right_lane_exist == True and self.left_sign == False: 
+                    self.switch_left = False
+                    self.far_right_angle = 0.0
 
-      # Make the turn to the right lane
+    # In case there is a switch to the right
     if self.switch_right == True:
-      if (not (self.left_lane_exist == False and self.right_lane_exist == False)):
-        # if self.left_sign == False and self.right_object == False:
-          if self.left_angle == 0.0 and self.right_angle == 0.0:
-            if self.right_lane_exist == True:
+        if self.left_sign == False and self.right_object == False:
+          if self.straight_path:
+            if far_right.any():
                 omega = self.calculate_omega(mean_right, mean_far_right, middle)
             else:
-                if self.left_lane_exist == True:
-                    omega = self.calculate_omega(mean_left, mean_right, middle)
-                    if self.right_sign == False: 
-                      self.switch_right = False
-                      self.far_left_angle = 0.0
+                if self.left_lane_exist == True and self.right_sign == False: 
+                    self.switch_right = False
+                    self.far_left_angle = 0.0
             
 
     # Send velocity
     if not rospy.is_shutdown():
         self.send_velocity(omega)
     
-
-## Situation where there is turn to the left by the left sign, 
-## then a sign UP jumps.
-## beside that tehre is a turn
    
