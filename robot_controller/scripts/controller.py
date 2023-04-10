@@ -70,7 +70,7 @@ class Controller(object):
   def signs_detection_callback(self):
       
       sign = None
-      sign = self.signs_recognizer.classify(self.lane_follower.original_image)
+      sign = self.signs_recognizer.process(self.lane_follower.original_image)
       if sign != None:
           if self.last_sign != sign:
               print(self.signs_recognizer.labels[sign-1])
@@ -167,9 +167,9 @@ class Controller(object):
             self.old_speed = 0.0   
             self.object_restrection = False          
 
+  ### In case there is an object in front and the robot is turning
     if self.lane_follower.straight_path == True and self.object_tracker.lane_occupied[obj_direction[3]] == False:
       if self.lane_follower.switch_left == False and self.lane_follower.switch_right == False and self.old_speed != 0.0:
-          # print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ FUC ME SWITCH")
           self.lane_follower.forward_speed = self.old_speed
           self.old_speed = 0.0   
           self.object_restrection = False

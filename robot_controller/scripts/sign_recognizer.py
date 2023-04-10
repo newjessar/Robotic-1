@@ -86,43 +86,29 @@ class SignRecognizer:
                     if (x > 1160 and y > 200):
                         continue
                     else:
-                        # print("x: ", x, "y: ", y, "w: ", w, "h: ", h)
                         cropped_image = image[y:y+h, x:x+w]
                         size = (self.roi_classification_size, self.roi_classification_size)
                         output = cv2.resize(cropped_image, size, interpolation=cv2.INTER_AREA)
                         arr_rois.append(output)
                         # Shwoing the ROI
                         cv2.imshow("roi", output)
-                        cv2.waitKey(1)
-        # Save the data for further Analysis
-        # data_array = np.asarray(self.array_of_signs)
-        # np.savez('bROIRL.npz', data_array)    
+                        cv2.waitKey(1)  
 
         return arr_rois
 
     # Predict the ROI image and return the label
     def predict(self, roi):
-    # Run the self.model.predict function with the input of the ROI image, remember that the input should be normalized
-    # Return the label of the ROI image 
+        # Run the self.model.predict function with the input of the ROI image, remember that the input should be normalized
         flouting_ROI = np.asarray(roi).astype(np.float32)
         normalize_ROI = np.true_divide(flouting_ROI, 255)
         label_images = self.model.predict(normalize_ROI)
     
+        # Return the label of the ROI image 
         return label_images
 
-
-    def process(self, image):
-        pass
-
     # # Classify and save the data to a file
-    def classify(self, image):
+    def process(self, image):
 
-        # If self.collect == False
-        #     Return either 1 ROI, or return the label of that ROI 
-        # self.labels = ["left", "right", "up", "square", "triangle", "smiley", "background"]
-        # self.labels = [" 1 ",  "  2  ", "3 ", "   4  ", "    5   ", "   6  ", "    7     "]
-
-        # print("running process")
         if image is None:
             # Handle the case when the image is not valid
             print("Invalid image format")
