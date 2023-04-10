@@ -90,9 +90,9 @@ class SignRecognizer:
                         size = (self.roi_classification_size, self.roi_classification_size)
                         output = cv2.resize(cropped_image, size, interpolation=cv2.INTER_AREA)
                         arr_rois.append(output)
-                        # Shwoing the ROI
-                        cv2.imshow("roi", output)
-                        cv2.waitKey(1)  
+                        # ## Shwoing the ROI
+                        # cv2.imshow("roi", output)
+                        # cv2.waitKey(1)  
 
         return arr_rois
 

@@ -167,7 +167,7 @@ class Controller(object):
             self.old_speed = 0.0   
             self.object_restrection = False          
 
-  ### In case there is an object in front and the robot is turning
+  ### In case there is an object in front but the robot is turning
     if self.lane_follower.straight_path == True and self.object_tracker.lane_occupied[obj_direction[3]] == False:
       if self.lane_follower.switch_left == False and self.lane_follower.switch_right == False and self.old_speed != 0.0:
           self.lane_follower.forward_speed = self.old_speed
