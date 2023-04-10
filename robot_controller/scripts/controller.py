@@ -70,10 +70,10 @@ class Controller(object):
   def signs_detection_callback(self):
       
       sign = None
-      sign = (self.signs_recognizer.classify(self.lane_follower.original_image))
+      sign = self.signs_recognizer.classify(self.lane_follower.original_image)
       if sign != None:
           if self.last_sign != sign:
-              print(self.signs_recognizer.labels[sign-1])
+              print(self.signs_recognizer.labels[sign])
               self.last_sign = sign
           
           if sign == 1:

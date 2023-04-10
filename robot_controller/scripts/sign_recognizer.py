@@ -149,7 +149,7 @@ class SignRecognizer:
                     self.collectedROIs.append(item)
 
             # Return the label of the ROI
-            return label_idx+1 if label_idx != None else None
+            return label_idx if label_idx != None else None
 
 
     # When data collection mode is one, the data will be saved on a numpy file when the program is closed
