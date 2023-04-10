@@ -73,7 +73,7 @@ class Controller(object):
       sign = self.signs_recognizer.classify(self.lane_follower.original_image)
       if sign != None:
           if self.last_sign != sign:
-              print(self.signs_recognizer.labels[sign])
+              print(self.signs_recognizer.labels[sign-1])
               self.last_sign = sign
           
           if sign == 1:
