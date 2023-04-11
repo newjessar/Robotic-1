@@ -53,13 +53,13 @@ history = model.fit(train_x_data, train_y_data, epochs=NR_OF_EPOCHS, batch_size 
 #########################       Unhide when you want to plot the accuracy over epochs           ##########################
 ###########################################################################################################################
 
-## Plot the training accuracy over epochs
-plt.plot(history.history['accuracy'])
-plt.title('Model Accuracy')
-plt.ylabel('Accuracy')
-plt.xlabel('Epoch')
-plt.legend(['Train'], loc='upper left')
-plt.show()
+# ## Plot the training accuracy over epochs
+# plt.plot(history.history['accuracy'])
+# plt.title('Model Accuracy')
+# plt.ylabel('Accuracy')
+# plt.xlabel('Epoch')
+# plt.legend(['Train'], loc='upper left')
+# plt.show()
 ###########################################################################################################################
 
 # Save the model

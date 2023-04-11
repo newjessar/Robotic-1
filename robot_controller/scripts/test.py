@@ -1,3 +1,6 @@
+## This file contains the code to test the calssification of the traffic signs
+## It is left with the submition for the seek of reproducibility the data can be obtained from the submition folder
+## The data is stored in the npz file inside the folder Testing_data_repreducibility_purpose_only
 import numpy as np
 
 x = 0
