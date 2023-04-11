@@ -259,7 +259,6 @@ class LaneFollower(object):
     if far_right.any():
         mean_far_right = np.mean((far_right[:, 0] + far_right[:, 2]) / 2)
     
-
     # calculating omega
     omega = self.calculate_omega(mean_left, mean_right, middle)
 
