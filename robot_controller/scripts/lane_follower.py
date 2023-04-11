@@ -85,8 +85,6 @@ class LaneFollower(object):
 
     # # Declare the lines
     far_left, left, right, far_right = [], [], [], []
-    # Find all the lines using cv2.HoughLinesP function
-    # lines = np.asarray(cv2.HoughLinesP(binary_mask, 0.3, np.pi/180, 70, 100, 5))
 
     # # Assuming 'image' is your grayscale input image
     lsd = cv2.createLineSegmentDetector(0)
@@ -98,9 +96,6 @@ class LaneFollower(object):
     ## Remove the extra dimension from the lines array
     lines = np.squeeze(lines)
 
-    # lines = cv2.HoughLinesP(binary_mask,1,np.pi/180, 10)
-    # lines = np.asarray(lines)
-    # lines = np.squeeze(lines)
     # ## Itteration over the lines to get the far_left, left, right, far_right lines
     if lines.any():
         # Calculate the average x values for each line

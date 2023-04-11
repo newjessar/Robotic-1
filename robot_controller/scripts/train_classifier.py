@@ -26,8 +26,6 @@ train_x_data = np.load(os.environ["HOME"] + "/data/train_classifier.npy").astype
 train_y_data = np.load(os.environ["HOME"] + "/data/label_classifier.npy").astype(np.int32)
 
 # Create a model 
-
-
 model = models.Sequential()
 
 # Add CNN layer(s) to the model
