@@ -279,10 +279,8 @@ class LaneFollower(object):
     if self.left_sign == True: self.switch_right = False
     if self.right_sign == True: self.switch_left = False
     if far_left.any() and not far_right.any(): 
-        # print("cancle switch left")
         self.switch_right = False
     if far_right.any() and not far_left.any():
-        # print("cancle switch right")
         self.switch_left = False
 
     # In case there is a switch to the left

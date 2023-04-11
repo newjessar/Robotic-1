@@ -3,6 +3,7 @@ from tensorflow.keras import layers, models
 import numpy as np 
 import cv2
 import os
+import matplotlib.pyplot as plt
 
 # Set the number of outputs/classes to train with
 NR_OF_CLASSES = 6
@@ -44,7 +45,22 @@ model.add(layers.Dense(NR_OF_CLASSES, activation="softmax"))
 model.compile(optimizer="adam", 
         loss="categorical_crossentropy", 
         metrics=["accuracy"])
-model.fit(train_x_data, train_y_data, epochs=NR_OF_EPOCHS, batch_size = BATCH_SIZE, shuffle=True, verbose = 1)
+
+## Train the model and store the history
+history = model.fit(train_x_data, train_y_data, epochs=NR_OF_EPOCHS, batch_size = BATCH_SIZE, shuffle=True, verbose = 1)
+
+###########################################################################################################################
+#########################       Unhide when you want to plot the accuracy over epochs           ##########################
+###########################################################################################################################
+
+## Plot the training accuracy over epochs
+plt.plot(history.history['accuracy'])
+plt.title('Model Accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(['Train'], loc='upper left')
+plt.show()
+###########################################################################################################################
 
 # Save the model
 save_path = os.path.join(os.environ["HOME"], "network_model")

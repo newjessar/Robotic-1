@@ -138,7 +138,6 @@ class Controller(object):
               self.lane_follower.right_object = False
               
 
-        # print("front object: ", self.object_tracker.lane_occupied[obj_direction[2]], "front Turn", self.object_tracker.lane_occupied[obj_direction[3]], "old speed: ", self.old_speed, "switch left: ", self.lane_follower.switch_left, "switch right: ", self.lane_follower.switch_right)
         # if object in front
         if self.object_tracker.lane_occupied[obj_direction[2]] == True:
 

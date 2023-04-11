@@ -44,16 +44,20 @@ model.compile(optimizer="adam",
         loss="categorical_crossentropy", 
         metrics=["accuracy"])
 
-# Train the model and store the history
-history = model.fit(train_x_data, train_y_data, epochs=NR_OF_EPOCHS, batch_size = BATCH_SIZE, shuffle=True, verbose = 1)
+# Unhide  
+model.fit(train_x_data, train_y_data, epochs=NR_OF_EPOCHS, batch_size = BATCH_SIZE, shuffle=True, verbose = 1)
 
-# Plot the training accuracy over epochs
-plt.plot(history.history['accuracy'])
-plt.title('Model Accuracy')
-plt.ylabel('Accuracy')
-plt.xlabel('Epoch')
-plt.legend(['Train'], loc='upper left')
-plt.show()
+
+# ## Train the model and store the history
+# history = model.fit(train_x_data, train_y_data, epochs=NR_OF_EPOCHS, batch_size = BATCH_SIZE, shuffle=True, verbose = 1)
+
+# ## Plot the training accuracy over epochs
+# plt.plot(history.history['accuracy'])
+# plt.title('Model Accuracy')
+# plt.ylabel('Accuracy')
+# plt.xlabel('Epoch')
+# plt.legend(['Train'], loc='upper left')
+# plt.show()
 
 # Save the model
 save_path = os.path.join(os.environ["HOME"], "network_model")

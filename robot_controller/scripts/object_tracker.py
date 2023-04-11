@@ -27,15 +27,12 @@ class ObjectTracker(object):
         if clusters:
             for item in clusters:
                 x, y = item
-                # print("x: ", x, "y: ", y)
                 # # object on front within 2.0 meters
                 if (0.0 <= x <= 2.0) and (-0.25 < y < 0.25):
-                    # print("object in front")
                     self.lane_occupied["front"] = True
 
                 if (0.0 <= x <= 2.0):
                     if ((-0.375 < y < -0.25) or (0.375 > y > 0.25)):
-                        # print("object turn in front")
                         self.lane_occupied["front_turn"] = True
              
                 # object on the right
